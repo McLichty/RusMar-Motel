@@ -1,0 +1,183 @@
+// @ Functions
+// ====================================================================================
+// Convert px to em
+@function pxtoem($target, $context){
+	@return ($target/$context)+0em;
+}
+// Convert em to px
+@function emtopx($target, $context){
+	@return ($target*$context)+0px;
+}
+
+// @ Mixins
+// ====================================================================================
+// * box-shadow()
+// * a mixin to automate the code needed for the various browsers.
+// * @author
+// * Matthew B Cannon
+// * @param $hor
+// * the horizontal position of the shadow
+// * @param $ver
+// * the vertical position of the shadow
+// * @param $blur
+// * the amount of blur of the shadow
+// * @param $color
+// * the color of the shaow
+// * @param $inset
+// * applies the shadow inside of the element instead of the default outside.
+// * this argument must exactly match the word 'inset' or else it will not be applied
+//
+@mixin mc-box-shadow($hor: 0px, $ver: 0px, $blur: 4px, $color: rgba(0, 0, 0, 0.5), $inset: false) {
+	@if $hor != none{
+		@if $inset != inset {
+			box-shadow: $hor $ver $blur $color;
+			-moz-box-shadow: $hor $ver $blur $color;
+			-webkit-box-shadow: $hor $ver $blur $color;
+		} @else {
+			box-shadow: inset $hor $ver $blur $color;
+			-moz-box-shadow: inset $hor $ver $blur $color;
+			-webkit-box-shadow: inset $hor $ver $blur $color;
+		}
+	} @else {
+		box-shadow: none;
+		-moz-box-shadow: none;
+		-webkit-box-shadow: none;
+	}
+}
+// * mc-border-radius()
+// * a mixin to automate the border-radius code needed for the various browsers.
+// * @author
+// * Matthew B Cannon
+// * @param $x
+// * the values for all 4 corners
+// * Or, the values of horizontal radii corners
+// * @param $y
+// * the values of vertical radii corners
+// * only used when a second argument is supplied
+// * @return
+// * -webkit-border-radius: $x;
+// * -moz-border-radius: $x;
+// * border-radius: $x;
+// * @or return
+// * -webkit-border-radius: $x / $y;
+// * -moz-border-radius: $x / $y;
+// * border-radius: $x / $y;
+@mixin mc-border-radius($x: 5px, $y: none) {
+	@if $x != none {
+		$x_length : length($x);
+		@if $y != none {
+			$y_length : length($y);
+			@if $x_length < 5 {
+				@if $y_length < 5 {
+					-webkit-border-radius: #{$x} / #{$y};
+					-moz-border-radius: #{$x} / #{$y};
+					border-radius: #{$x} / #{$y};
+				} @else {
+					border-radius: You supplied "#{$y}" which is #{$y_length - 4} too many arguments for the vertical radii;
+				}
+			} @else {
+				border-radius: You supplied "#{$x}" which is #{$x_length - 4} too many arguments for the horizontal radii;
+			}
+		} @else if $x_length < 5 {
+			-webkit-border-radius: $x;
+			-moz-border-radius: $x;
+			border-radius: $x;
+		} @else {
+			border-radius: You supplied "#{$x}" which is #{$x_length - 4} too many arguments for the horizontal radii;
+		}
+	} @else {
+		-webkit-border-radius: none;
+		-moz-border-radius: none;
+		border-radius: none;
+	}
+}
+// * mc-rgba()
+// * makes adding rgba() with a fallback of rgb() for older IE's easy
+// * @author
+// * Matthew B Cannon
+// * @param $color
+// * the rgba value without commas
+// * @param $args
+// * addition style attributes to add to the property along with the $color.
+// * @param $property
+// * An optional property to apply the $color and $args to.
+// * By default, the property is set to background.
+// * @return
+// * $property : $rgb;
+// * $property : $rgba;
+@mixin mc-rgba($color, $args: none, $property: none) {
+	$rgb: rgb(nth($color, 1), nth($color, 2), nth($color, 3));
+	$rgba: rgba(nth($color, 1), nth($color, 2), nth($color, 3), nth($color, 4));
+	@if $property == none {
+		@if $args == none {
+			background: $rgb;
+			background: $rgba;
+		} @else {
+			background: #{$rgb} #{$args};
+			background: #{$rgb} #{$args};
+		}
+	} @else {
+		@if $args == none {
+			#{$property}: $rgb;
+			#{$property}: $rgba;
+		} @else {
+			#{$property}: #{$rgb} #{$args};
+			#{$property}: #{$rgba} #{$args};
+		}
+	}
+}
+
+@mixin mc-transition($property, $s1, $ease, $s2) {
+	@if $s2 != '' {
+		-webkit-transition: $property $s1 $ease $s2;  
+		-moz-transition: $property $s1 $ease $s2;
+		-o-transition: $property $s1 $ease $s2;
+		transition: $property $s1 $ease $s2;
+	} @else {
+		-webkit-transition: $property $s1 $ease;  
+		-moz-transition: $property $s1 $ease;
+		-o-transition: $property $s1 $ease;
+		transition: $property $s1 $ease;
+	}
+}
+@mixin mc-gradient($direction, $start, $end, $ms-filter: true) {
+	// @ horizontal
+	//====================== */
+	@if $direction == horizontal {
+		background: -moz-linear-gradient(left, $start 0%, $end 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, right top, color-stop(0%,$start), color-stop(100%,$end)); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(left, $start 0%,$end 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(left, $start 0%,$end 100%); /* Opera11.10+ */
+		background: -ms-linear-gradient(left, $start 0%,$end 100%); /* IE10+ */
+		@if $ms-filter == true {
+			filter: progid:DXImageTransform.Microsoft.gradient( GradientType=1, startColorstr='#{$start}', endColorstr='#{$end}' ); /* IE6-9 */
+		}
+	
+		background: linear-gradient(left, $start 0%,$end 100%); /* W3C */
+	}
+	// @ vertical
+	//====================== */
+	@if $direction == vertical {
+		background-image: -moz-linear-gradient(top, $start 0%, $end 100%); /* FF3.6+ */
+		background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$start), color-stop(100%,$end)); /* Chrome,Safari4+ */
+		background-image: -webkit-linear-gradient(top, $start 0%,$end 100%); /* Chrome10+,Safari5.1+ */
+		background-image: -o-linear-gradient(top, $start 0%,$end 100%); /* Opera11.10+ */
+		background-image: -ms-linear-gradient(top, $start 0%,$end 100%); /* IE10+ */
+		@if $ms-filter == true {
+			filter: progid:DXImageTransform.Microsoft.gradient( GradientType=0, startColorstr='#{$start}', endColorstr='#{$end}' ); /* IE6-9 */
+		}
+		background-image: linear-gradient(top, $start 0%,$end 100%); /* W3C */
+		zoom: 1;
+	}
+	// @ radial
+	//====================== */
+	@if $direction == radial {
+//		background-image: -webkit-gradient(radial, center center, 0, center center, 141, from($start), to($end), color-stop(25%, blue), color-stop(40%, green), color-stop(60%, red), color-stop(80%, purple)); /* old WebKit Syntax */  
+		background-image: -webkit-gradient(radial, center center, 0, center center, 141, from($start), to($end), color-stop(0%, $start), color-stop(100%, $end)); /* old WebKit Syntax */  
+		background-image: -webkit-radial-gradient(center center, ellipse closest-side, $start 0%, $end 100%); /* New WebKit syntax */  
+		background-image: -moz-radial-gradient(center center, ellipse closest-side, $start 0%, $end 100%);  
+		background-image: -ms-radial-gradient(center center, ellipse closest-side, $start 0%, $end 100%); /* IE10+ */  
+		background-image: -o-radial-gradient(center center, ellipse closest-side, $start 0%, $end 100%); /* Opera (13?) */  
+		background-image: radial-gradient(center center, ellipse closest-side, $start 0%, $end 100%); /* standard syntax */  
+	}
+}

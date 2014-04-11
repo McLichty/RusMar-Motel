@@ -1,0 +1,64 @@
+a {
+	&:link {
+		color:$purple;
+	}
+	&:visited {
+		color:darken($purple,20%);
+	}
+	&:hover,
+	&:focus {
+		color:lighten($purple,20%);
+	}
+	&:active {
+	}
+}
+#main-content-top {
+	#promotion-alpha {
+		.region {
+			background:$green;
+			@include mc-border-radius(100%);
+			@include mc-gradient(radial, #fff, $green);
+			border:5px solid #000;
+			font-weight:bold;
+			margin:0 20px;
+			padding:10px;
+			text:{
+				align:center;
+				transform: uppercase;
+			}
+			p,
+			.block{
+				margin-bottom:8px;
+			}
+		}
+	}
+	#promotion-omega {
+		text-align:right;
+	}
+}
+#main {
+	#page-title {
+		font:{
+			family: 'Francois One', sans-serif;
+			size:pxtoem(50,16);
+		}
+		margin-bottom:-20px;
+		padding:0 65px;
+		position:relative;
+		text-align:right;
+		z-index:20;
+	}
+	#main-content {
+		background:#fff;
+		@include mc-border-radius(0 0 20px 0, 0 0 10px 0);
+		border-top:2px solid #CCC;
+		border-bottom:5px solid #666;
+		@include mc-box-shadow(-8px,10px);
+		padding:20px 14px 90px 40px;
+		position:relative;
+		z-index:15;
+		.node {
+			margin-bottom:0;
+		}
+	}
+}
