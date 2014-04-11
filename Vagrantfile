@@ -1,8 +1,8 @@
 
 Vagrant.configure("2") do |config|
   # Variables to Change
-  project = 'normansglass'
-  box_ip = '172.16.10.24'
+  project = 'rusmarmotel'
+  box_ip = '172.16.10.20'
   #box_memory = 2048
   box_memory = 1024
   # Define the top level domain (ex. .com, .org, .net)

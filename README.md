@@ -1,4 +1,4 @@
-AH Web Core Product
+Rusmar Motel
 =====
 
 Base core product.
@@ -26,16 +26,8 @@ Install using:
 * Now the mainline should be merged in with your local commit. Do another "git status" to make sure you don't have to do a git add/commit again.
 * git push origin BRANCH_NAME = Change BRANCH_NAME to the name of the branch you wish to push to your forked repo.
 
-## Menu Import
-Maksim created a helper module/feature called "menu_feature" which adds a drush command for creating a txt file full of the menu paths. In order for the menu to be included, add the menu in question to the list of menus ($menu_files) within the menu_feature_menus() function. Located on line 10 of the menu_feature.module file.
-
-To create/rewrite the exported menu files the drush command must be run from the command line. The following drush commands are being added by the menu_feature feature.
-* mf-export = Exports the menus listed in the menu_feature.module to txt files within the root of the feature directory.
-* mf-import = This does the opposite and imports the same listed menus.
- * This command is already being triggered from the build script.
-
 
 # CHANGELOG
 =====
-* 2014-1-2 - Copy of Oarsi to New repo. -JPF
+* 2014-4-10 - Put the site in a git repo. -MBC
 
