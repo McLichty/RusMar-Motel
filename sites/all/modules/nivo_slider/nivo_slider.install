@@ -1,112 +1,46 @@
 <?php
+
 /**
  * @file
  * Install, update and uninstall functions for the Nivo Slider module.
  */
 
-// Include the banner generation functions
-include_once('banners.inc');
-
-/**
- * Implements hook_install().
- */
-function nivo_slider_install() {
-  $settings = array(
-    1 => array(
-      'image_path' => 'images/1.jpg',
-      'image_title' => 'Title for image 1',
-      'image_description' => 'Description for image 1',
-      'image_published' => 'TRUE',
-      'image_transition' => '',
-      'image_weight' => 1,
-      'image_published' => TRUE,
-    ),
-    2 => array(
-      'image_path' => 'images/2.jpg',
-      'image_title' => 'Title for image 2',
-      'image_description' => 'Description for image 2',
-      'image_published' => 'TRUE',
-      'image_transition' => '',
-      'image_weight' => 2,
-      'image_published' => TRUE,
-    ),
-    3 => array(
-      'image_path' => 'images/3.jpg',
-      'image_title' => 'Title for image 3',
-      'image_description' => 'Description for image 3',
-      'image_published' => 'TRUE',
-      'image_transition' => '',
-      'image_weight' => 3,
-      'image_published' => TRUE,
-    ),
-    4 => array(
-      'image_path' => 'images/4.jpg',
-      'image_title' => 'Title for image 4',
-      'image_description' => 'Description for image 4',
-      'image_published' => 'TRUE',
-      'image_transition' => '',
-      'image_weight' => 4,
-      'image_published' => TRUE,
-    ),
-    5 => array(
-      'image_path' => 'images/5.jpg',
-      'image_title' => 'Title for image 5',
-      'image_description' => 'Description for image 5',
-      'image_published' => 'TRUE',
-      'image_transition' => '',
-      'image_weight' => 5,
-      'image_published' => TRUE,
-    ),
-    6 => array(
-      'image_path' => 'images/6.jpg',
-      'image_title' => 'Title for image 6',
-      'image_description' => 'Description for image 6',
-      'image_published' => 'TRUE',
-      'image_transition' => '',
-      'image_weight' => 6,
-      'image_published' => TRUE,
-    ),
-  );
-
-  // Default data
-  $file = new stdClass;
-  $banners = array();
-
-  // Source base for images
-  $src_base_path = drupal_get_path('module', 'nivo_slider');
-  $default_banners = $settings;
-
-  // Put all image as banners
-  foreach ($default_banners as $i => $data) {
-    $file->uri = $src_base_path . '/' . $data['image_path'];
-    $file->filename = $file->uri;
-
-    $banner = _nivo_slider_save_image($file);
-    unset($data['image_path']);
-    $banner = array_merge($banner, $data);
-    $banners[$i] = $banner;
-  }
-
-  // Save banner data
-  nivo_slider_set_banners($banners);
-}
-
 /**
  * Implements hook_uninstall().
  */
 function nivo_slider_uninstall() {
-  // Banner images
+  // Get the current slider settings
+  $slides = variable_get('nivo_slider_banner_settings', array());
+
+  // Delete all of the slide images
+  foreach ($slides as $slide) {
+    // Check if the slide has a file ID
+    if (isset($slide['fid'])) {
+      // Load the file that corresponds to the file ID
+      $file_object = file_load($slide['fid']);
+
+      // Delete the file
+      if ($file_object) {
+        file_delete($file_object);
+      }
+    }
+  }
+
+  // Delete the folder the slider images were contained in
   $banner_folder = 'public://banner/';
   file_unmanaged_delete_recursive($banner_folder);
 
-  // Banner
+  // Remove slide variables
   variable_del('nivo_slider_banner_settings');
+  variable_del('nivo_slider_banner_html_captions');
 
-  // Options
+  // Remove option variables
   variable_del('nivo_slider_theme');
+  variable_del('nivo_slider_image_style');
+  variable_del('nivo_slider_image_style_slide');
+  variable_del('nivo_slider_image_style_thumb');
   variable_del('nivo_slider_random_start');
   variable_del('nivo_slider_start_slide');
-  variable_del('nivo_slider_caption_opacity');
   variable_del('nivo_slider_effect');
   variable_del('nivo_slider_slices');
   variable_del('nivo_slider_box_columns');
@@ -116,29 +50,11 @@ function nivo_slider_uninstall() {
   variable_del('nivo_slider_directional_navigation');
   variable_del('nivo_slider_next_text');
   variable_del('nivo_slider_previous_text');
-  variable_del('nivo_slider_directional_navigation_hide');
   variable_del('nivo_slider_control_navigation');
   variable_del('nivo_slider_control_nav_thumbs');
-  variable_del('nivo_slider_keyboard_navigation');
   variable_del('nivo_slider_manual_advance');
   variable_del('nivo_slider_pause_time');
-}
-
-/**
- * Implements hook_enable().
- */
-function nivo_slider_enable() {
-  $styles = image_styles();
-  foreach ($styles as $style) {
-    image_style_flush($style);
-  }
-}
-
-/**
- * Implements hook_disable().
- */
-function nivo_slider_disable() {
-  nivo_slider_enable();
+  variable_del('nivo_slider_dir_name');
 }
 
 /**
@@ -155,15 +71,114 @@ function nivo_slider_update_7000() {
  * Add a default transition to each slide where applicable.
  */
 function nivo_slider_update_7001() {
+  // Get the current slider settings
   $slider = variable_get('nivo_slider_banner_settings', array());
 
+  // Add a default transition to each existing slide
   foreach ($slider as &$slide) {
     if (!isset($slide['image_transition'])) {
       $slide['image_transition'] = '';
     }
   }
 
+  // Save the updated settings
   variable_set('nivo_slider_banner_settings', $slider);
 
   return t('Added a default transition to each slide where applicable.');
+}
+
+/**
+ * Update existing slide property names and add new properties.
+ */
+function nivo_slider_update_7002() {
+  // Create an array to hold the new slider settings
+  $new_slider = array();
+
+  // Get the old slider settings
+  $old_slider = variable_get('nivo_slider_banner_settings', array());
+
+  foreach ($old_slider as $old_slide) {
+    $new_slider[] = array(
+      'path' => isset($old_slide['image_path']) ? $old_slide['image_path'] : '',
+      'title' => isset($old_slide['image_title']) ? $old_slide['image_title'] : '',
+      'description' => array(
+        'value' => isset($old_slide['image_description']) ? $old_slide['image_description'] : '',
+        'format' => 'plain_text',
+      ),
+      'url' => isset($old_slide['image_url']) ? $old_slide['image_url'] : '',
+      'visibility' => isset($old_slide['image_visibility']) ? $old_slide['image_visibility'] : '*',
+      'transition' => isset($old_slide['image_transition']) ? $old_slide['image_transition'] : '',
+      'weight' => isset($old_slide['image_weight']) ? $old_slide['image_weight'] : 1,
+      'published' => isset($old_slide['image_published']) ? $old_slide['image_published'] : TRUE,
+      'delete' => isset($old_slide['image_delete']) ? $old_slide['image_delete'] : '',
+    );
+  }
+
+  // Save the new settings
+  variable_set('nivo_slider_banner_settings', $new_slider);
+
+  return t('Updated existing slide property names and added new properties.');
+}
+
+/**
+ * Remove obsolete variables.
+ */
+function nivo_slider_update_7003() {
+  variable_del('nivo_slider_caption_opacity');
+  variable_del('nivo_slider_keyboard_navigation');
+
+  return t('Removed obsolete variables.');
+}
+
+/**
+ * Convert existing slide URIs to file IDs.
+ */
+function nivo_slider_update_7004() {
+  // Get the current slider settings
+  $slider = variable_get('nivo_slider_banner_settings', array());
+
+  // Process each of the slides
+  foreach ($slider as &$slide) {
+    // If the slide has a URI continue processing, otherwise delete the slide
+    if (isset($slide['path'])) {
+      // Find the URI of the current slide
+      $uri = $slide['path'];
+
+      // Find the file ID of the file with the URI
+      $fid = db_query('SELECT fid FROM {file_managed} WHERE uri = :uri', array(':uri' => $uri))->fetchField();
+
+      // If the ID of the slide's image file can be found then load the file
+      // otherwise, delete the slide
+      if (!empty($fid)) {
+        // Load the file with the file ID
+        $file = file_load($fid);
+
+        // Add the file ID to the slide settings
+        $slide['fid'] = $file->fid;
+
+        // Remove the existing path setting
+        unset($slide['path']);
+      }
+      else {
+        unset($slide);
+      }
+    }
+    else {
+      unset($slide);
+    }
+  }
+
+  // Save the updated settings
+  variable_set('nivo_slider_banner_settings', $slider);
+
+  return t('Converted existing slide URIs to file IDs.');
+}
+
+/**
+ * Remove obsolete variables.
+ */
+function nivo_slider_update_7005() {
+  variable_del('nivo_slider_directional_navigation_hide');
+
+  return t('Removed obsolete variables.');
 }

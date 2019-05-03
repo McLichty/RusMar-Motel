@@ -3,13 +3,16 @@ description = Provides a user interface for building a rotating banner powered b
 core = 7.x
 
 dependencies[] = block
-dependencies[] = image
-dependencies[] = libraries
-dependencies[] = menu
+dependencies[] = jquery_update
+dependencies[] = libraries (2.x)
 
-; Information added by drupal.org packaging script on 2012-02-16
-version = "7.x-1.2"
+files[] = nivo_slider.test
+
+configure = admin/structure/nivo-slider
+
+; Information added by Drupal.org packaging script on 2017-12-19
+version = "7.x-1.12"
 core = "7.x"
 project = "nivo_slider"
-datestamp = "1329378641"
+datestamp = "1513699993"
 
