@@ -1,0 +1,302 @@
+/* $Id: styles.css,v 1.1.2.2.2.1 2011/01/11 01:08:49 dvessel Exp $ */
+/* line 8, ../sass/styles.scss */
+h1#site-name {
+  margin-bottom: 0;
+}
+
+/* line 18, ../sass/styles.scss */
+#site-header,
+#site-subheader,
+#footer-region,
+.column,
+.node,
+.comment,
+.block {
+  margin-bottom: 1.5em;
+}
+
+/* line 23, ../sass/styles.scss */
+ul.main-menu,
+ul.secondary-menu {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+/* line 1, ../sass/layout/_page.scss */
+body {
+  background: url("img/bg_main_starburst.png") no-repeat 65% 50%, url("img/bg_main_polygon.png") no-repeat 50% 60%, url("img/bg_main_blocks.png");
+  background-color: #61c198;
+  font-size: 100%;
+}
+
+/* line 10, ../sass/layout/_page.scss */
+.palmtree_L {
+  display: block;
+  margin-top: 30px;
+  margin-right: auto;
+  width: 75%;
+}
+
+/* line 16, ../sass/layout/_page.scss */
+.palmtree_R {
+  display: block;
+  margin: -120px -30px 0 auto;
+  position: relative;
+  z-index: 30;
+}
+
+/* line 1, ../sass/layout/_menus.scss */
+#site-menu {
+  background: url("img/bg_main_menu.png") no-repeat 0 0;
+  font-family: 'Francois One', sans-serif;
+  font-size: 1.5em;
+  letter-spacing: 0.125em;
+  text-align: center;
+}
+/* line 9, ../sass/layout/_menus.scss */
+#site-menu li {
+  display: block;
+}
+/* line 11, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-1 {
+  margin-bottom: 8px;
+  padding-left: 69px;
+  padding-right: 165px;
+}
+/* line 15, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-1 a {
+  color: #f3676a;
+  padding: 7px 0;
+}
+/* line 19, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-1 a:hover, #site-menu li.menu-item-1 a:focus {
+  color: #f79698;
+}
+/* line 24, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-2 {
+  margin-bottom: 18px;
+  padding-left: 52px;
+  padding-right: 105px;
+}
+/* line 28, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-2 a {
+  color: #f3ec1a;
+  padding: 5px 0;
+}
+/* line 32, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-2 a:hover, #site-menu li.menu-item-2 a:focus {
+  color: #f6f04a;
+}
+/* line 37, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-3 {
+  margin-bottom: 14px;
+  padding-left: 33px;
+  padding-right: 151px;
+}
+/* line 41, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-3 a {
+  color: #ca1014;
+  padding: 5px 10px 8px;
+}
+/* line 45, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-3 a:hover, #site-menu li.menu-item-3 a:focus {
+  color: #ed2024;
+}
+/* line 50, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-4 {
+  margin-bottom: 15px;
+  padding-left: 71px;
+  padding-right: 158px;
+}
+/* line 54, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-4 a {
+  color: #2e7556;
+  padding: 5px 10px 9px;
+}
+/* line 58, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-4 a:hover, #site-menu li.menu-item-4 a:focus {
+  color: #3c9972;
+}
+/* line 63, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-5 {
+  margin-bottom: 8px;
+  padding-left: 94px;
+  padding-right: 98px;
+}
+/* line 67, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-5 a {
+  color: #f3676a;
+  padding: 7px 10px;
+}
+/* line 71, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-5 a:hover, #site-menu li.menu-item-5 a:focus {
+  color: #f79698;
+}
+/* line 76, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-6 {
+  margin-bottom: 8px;
+  padding-left: 69px;
+  padding-right: 165px;
+}
+/* line 80, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-6 a {
+  color: #f3676a;
+  padding: 7px 10px;
+}
+/* line 84, ../sass/layout/_menus.scss */
+#site-menu li.menu-item-6 a:hover, #site-menu li.menu-item-6 a:focus {
+  color: #f79698;
+}
+/* line 90, ../sass/layout/_menus.scss */
+#site-menu a {
+  display: block;
+  text-decoration: none;
+}
+/* line 93, ../sass/layout/_menus.scss */
+#site-menu a:visited {
+  color: #333333;
+}
+/* line 97, ../sass/layout/_menus.scss */
+#site-menu a:hover, #site-menu a:focus {
+  text-decoration: underline;
+}
+
+/* line 2, ../sass/layout/_content.scss */
+a:link {
+  color: #b9529f;
+}
+/* line 5, ../sass/layout/_content.scss */
+a:visited {
+  color: #753064;
+}
+/* line 9, ../sass/layout/_content.scss */
+a:hover, a:focus {
+  color: #d69bc7;
+}
+
+/* line 17, ../sass/layout/_content.scss */
+#main-content-top #promotion-alpha .region {
+  background: #61c198;
+  -webkit-border-radius: 100%;
+  -moz-border-radius: 100%;
+  border-radius: 100%;
+  background-image: -webkit-gradient(radial, center center, 0, center center, 141, from(white), to(#61c198), color-stop(0%, white), color-stop(100%, #61c198));
+  /* old WebKit Syntax */
+  background-image: -webkit-radial-gradient(center center, ellipse closest-side, white 0%, #61c198 100%);
+  /* New WebKit syntax */
+  background-image: -moz-radial-gradient(center center, ellipse closest-side, white 0%, #61c198 100%);
+  background-image: -ms-radial-gradient(center center, ellipse closest-side, white 0%, #61c198 100%);
+  /* IE10+ */
+  background-image: -o-radial-gradient(center center, ellipse closest-side, white 0%, #61c198 100%);
+  /* Opera (13?) */
+  background-image: radial-gradient(center center, ellipse closest-side, #ffffff 0%, #61c198 100%);
+  /* standard syntax */
+  border: 5px solid #000;
+  font-weight: bold;
+  margin: 0 20px;
+  padding: 10px;
+  text-align: center;
+  text-transform: uppercase;
+}
+/* line 30, ../sass/layout/_content.scss */
+#main-content-top #promotion-alpha .region p,
+#main-content-top #promotion-alpha .region .block {
+  margin-bottom: 8px;
+}
+/* line 35, ../sass/layout/_content.scss */
+#main-content-top #promotion-omega {
+  text-align: right;
+}
+
+/* line 40, ../sass/layout/_content.scss */
+#main #page-title {
+  font-family: 'Francois One', sans-serif;
+  font-size: 3.125em;
+  margin-bottom: -20px;
+  padding: 0 65px 0 0;
+  position: relative;
+  text-align: right;
+  z-index: 20;
+}
+/* line 51, ../sass/layout/_content.scss */
+#main #main-content {
+  background: #fff;
+  -webkit-border-radius: 0 0 20px 0 / 0 0 10px 0;
+  -moz-border-radius: 0 0 20px 0 / 0 0 10px 0;
+  border-radius: 0 0 20px 0 / 0 0 10px 0;
+  border-top: 2px solid #CCC;
+  border-bottom: 5px solid #666;
+  box-shadow: -8px 10px 4px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: -8px 10px 4px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: -8px 10px 4px rgba(0, 0, 0, 0.5);
+  padding: 20px 14px 90px 40px;
+  position: relative;
+  z-index: 15;
+}
+/* line 60, ../sass/layout/_content.scss */
+#main #main-content .node {
+  margin-bottom: 0;
+}
+/* line 63, ../sass/layout/_content.scss */
+#main #main-content table {
+  width: 100%;
+}
+/* line 67, ../sass/layout/_content.scss */
+#main #webervation {
+  width: 100%;
+  height: 340px;
+}
+
+/* line 3, ../sass/layout/_footer.scss */
+#footer .block-menu-block .menu {
+  float: right;
+  font-family: 'Francois One', sans-serif;
+  font-size: 1.25em;
+}
+/* line 9, ../sass/layout/_footer.scss */
+#footer .block-menu-block .menu li {
+  float: left;
+  list-style: none;
+  border-right: 1px dashed #ed2024;
+}
+/* line 13, ../sass/layout/_footer.scss */
+#footer .block-menu-block .menu li.last {
+  border-right: none;
+}
+/* line 17, ../sass/layout/_footer.scss */
+#footer .block-menu-block .menu a {
+  display: block;
+  padding: 1px 13px;
+}
+
+/* line 5, ../sass/layout/_lightbox2.scss */
+#lightbox .lightbox2-alt-layout-data #bottomNavClose,
+#lightbox .lightbox2-alt-layout #bottomNavClose {
+  background-position: 5px 5px;
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+  -webkit-border-radius: 100%;
+  -moz-border-radius: 100%;
+  border-radius: 100%;
+  position: absolute;
+  top: -13px;
+  margin-top: 0;
+  margin-left: -23px;
+  padding: 5px;
+}
+/* line 15, ../sass/layout/_lightbox2.scss */
+#lightbox .lightbox2-alt-layout-data #bottomNavClose:hover, #lightbox .lightbox2-alt-layout-data #bottomNavClose:focus,
+#lightbox .lightbox2-alt-layout #bottomNavClose:hover,
+#lightbox .lightbox2-alt-layout #bottomNavClose:focus {
+  background-position: -21px 5px;
+}
+/* line 21, ../sass/layout/_lightbox2.scss */
+#lightbox #imageData #bottomNav {
+  height: 0;
+}
+/* line 24, ../sass/layout/_lightbox2.scss */
+#lightbox #imageData #frameHoverNav {
+  display: none;
+}
