@@ -1,24 +1,15 @@
 <?php
 
 /**
- * @file
- * Definition of views_handler_field_url.
- */
-
-/**
- * Field handler that turns a URL into a clickable link.
+ * Field handler to provide simple renderer that turns a URL into a clickable link.
  *
  * @ingroup views_field_handlers
  */
 class views_handler_field_url extends views_handler_field {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function option_definition() {
+  function option_definition() {
     $options = parent::option_definition();
 
-    $options['display_as_link'] = array('default' => TRUE, 'bool' => TRUE);
+    $options['display_as_link'] = array('default' => TRUE);
 
     return $options;
   }
@@ -26,7 +17,7 @@ class views_handler_field_url extends views_handler_field {
   /**
    * Provide link to the page being visited.
    */
-  public function options_form(&$form, &$form_state) {
+  function options_form(&$form, &$form_state) {
     $form['display_as_link'] = array(
       '#title' => t('Display as link'),
       '#type' => 'checkbox',
@@ -35,20 +26,13 @@ class views_handler_field_url extends views_handler_field {
     parent::options_form($form, $form_state);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function render($values) {
+  function render($values) {
     $value = $this->get_value($values);
     if (!empty($this->options['display_as_link'])) {
-      $this->options['alter']['make_link'] = TRUE;
-      $this->options['alter']['path'] = $value;
-      $text = !empty($this->options['text']) ? $this->sanitize_value($this->options['text']) : $this->sanitize_value($value, 'url');
-      return $text;
+      return l($this->sanitize_value($value), $value, array('html' => TRUE));
     }
     else {
       return $this->sanitize_value($value, 'url');
     }
   }
-
 }

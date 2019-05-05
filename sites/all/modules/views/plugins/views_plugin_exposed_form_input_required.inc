@@ -1,32 +1,19 @@
 <?php
 
 /**
- * @file
- * Definition of views_plugin_exposed_form_input_required.
- */
-
-/**
- * Exposed form plugin that provides an exposed form with required input.
- *
- * @ingroup views_exposed_form_plugins
+ * Exposed form plugin that provides basic exposed form
  */
 class views_plugin_exposed_form_input_required extends views_plugin_exposed_form {
 
-  /**
-   * {@inheritdoc}
-   */
-  public function option_definition() {
+  function option_definition() {
     $options = parent::option_definition();
 
-    $options['text_input_required'] = array('default' => 'Select any filter and click on Apply to see results', 'translatable' => TRUE);
+    $options['text_input_required'] = array('default' => t('Select any filter and click on Apply to see results'), 'translatable' => TRUE);
     $options['text_input_required_format'] = array('default' => NULL);
     return $options;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function options_form(&$form, &$form_state) {
+  function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
 
     $form['text_input_required'] = array(
@@ -39,19 +26,13 @@ class views_plugin_exposed_form_input_required extends views_plugin_exposed_form
     );
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function options_submit(&$form, &$form_state) {
+  function options_submit(&$form, &$form_state) {
     $form_state['values']['exposed_form_options']['text_input_required_format'] = $form_state['values']['exposed_form_options']['text_input_required']['format'];
     $form_state['values']['exposed_form_options']['text_input_required'] = $form_state['values']['exposed_form_options']['text_input_required']['value'];
     parent::options_submit($form, $form_state);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function exposed_filter_applied() {
+  function exposed_filter_applied() {
     static $cache = NULL;
     if (!isset($cache)) {
       $view = $this->view;
@@ -72,10 +53,7 @@ class views_plugin_exposed_form_input_required extends views_plugin_exposed_form
     return $cache;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function pre_render($values) {
+  function pre_render($values) {
     if (!$this->exposed_filter_applied()) {
       $options = array(
         'id' => 'area',
@@ -86,7 +64,6 @@ class views_plugin_exposed_form_input_required extends views_plugin_exposed_form
         'group_type' => 'group',
         'content' => $this->options['text_input_required'],
         'format' => $this->options['text_input_required_format'],
-        'empty' => TRUE,
       );
       $handler = views_get_handler('views', 'area', 'area');
       $handler->init($this->view, $options);
@@ -97,10 +74,7 @@ class views_plugin_exposed_form_input_required extends views_plugin_exposed_form
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function query() {
+  function query() {
     if (!$this->exposed_filter_applied()) {
       // We return with no query; this will force the empty text.
       $this->view->built = TRUE;

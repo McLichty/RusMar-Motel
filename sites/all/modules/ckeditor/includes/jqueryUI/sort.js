@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 jQuery(document).ready(function() {
@@ -36,18 +36,19 @@ jQuery(document).ready(function() {
         tools = tools + "]";
         tools = tools.replace(/\[,/g, '[');
         tools = tools.replace(/\[],/g, '');
-        jQuery("#edit-toolbar").val(tools);
+        jQuery("#edit-toolbar").attr('value', tools);
     }
 
     Drupal.ckeditorToolbaInit = function() {
         Drupal.ckeditorToolbarUsedRender();
         Drupal.ckeditorToolbarAllRender();
-
-        var firefox = navigator.userAgent.toLowerCase().match(/firefox\/[0-9]\./);
+        
+        var firefox = navigator.userAgent.toLowerCase().match(/firefox/);
+        
         jQuery(".sortableList").sortable({
             connectWith: ".sortableList",
             items: "div.sortableListDiv",
-            sort: function(event, ui) {
+            sort: function(event, ui) { 
                 if (firefox){
                     ui.helper.css({'top' : ui.position.top - 35 + 'px'});
                 }
@@ -60,7 +61,7 @@ jQuery(document).ready(function() {
         jQuery(".sortableRow").sortable({
             connectWith: ".sortableRow",
             items: "li.sortableItem",
-            sort: function(event, ui) {
+            sort: function(event, ui) {  
                 if (firefox){
                     ui.helper.css({'top' : ui.position.top - 35 + 'px'});
                 }
@@ -148,4 +149,3 @@ jQuery(document).ready(function() {
 
     Drupal.ckeditorToolbaInit();
 });
-

@@ -1,5 +1,5 @@
 # Ignore configuration files that may contain sensitive information.
-/sites/*/settings*.php
+/sites/*/settings.local.php
 
 # Ignore paths that contain user-generated content.
 /sites/*/files
@@ -49,3 +49,7 @@ Thumbs.db
 # SASS #
 ##########
 .sass-cache
+
+# Pantheon files directory symlink #
+####################################
+sites/default/files

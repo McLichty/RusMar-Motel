@@ -63,7 +63,7 @@
    * Views Slideshow Text Controls
    */
 
-  // Add views slideshow api calls for views slideshow text controls.
+  // Add views slieshow api calls for views slideshow text controls.
   Drupal.behaviors.viewsSlideshowControlsText = {
     attach: function (context) {
 
@@ -109,8 +109,6 @@
   Drupal.viewsSlideshowControlsText.pause = function (options) {
     var pauseText = Drupal.theme.prototype['viewsSlideshowControlsPause'] ? Drupal.theme('viewsSlideshowControlsPause') : '';
     $('#views_slideshow_controls_text_pause_' + options.slideshowID + ' a').text(pauseText);
-    $('#views_slideshow_controls_text_pause_' + options.slideshowID).removeClass('views-slideshow-controls-text-status-play');
-    $('#views_slideshow_controls_text_pause_' + options.slideshowID).addClass('views-slideshow-controls-text-status-pause');
   };
 
   /**
@@ -119,8 +117,6 @@
   Drupal.viewsSlideshowControlsText.play = function (options) {
     var playText = Drupal.theme.prototype['viewsSlideshowControlsPlay'] ? Drupal.theme('viewsSlideshowControlsPlay') : '';
     $('#views_slideshow_controls_text_pause_' + options.slideshowID + ' a').text(playText);
-    $('#views_slideshow_controls_text_pause_' + options.slideshowID).removeClass('views-slideshow-controls-text-status-pause');
-    $('#views_slideshow_controls_text_pause_' + options.slideshowID).addClass('views-slideshow-controls-text-status-play');
   };
 
   // Theme the resume control.
@@ -146,17 +142,8 @@
     // Need to use try catch so we don't have to check to make sure every part
     // of the object is defined.
     try {
-      if (typeof Drupal.settings.viewsSlideshowPager != "undefined" && typeof Drupal.settings.viewsSlideshowPager[options.slideshowID].top.type != "undefined" && typeof Drupal[Drupal.settings.viewsSlideshowPager[options.slideshowID].top.type].transitionBegin == 'function') {
+      if (typeof Drupal.settings.viewsSlideshowPager[options.slideshowID].top.type != "undefined" && typeof Drupal[Drupal.settings.viewsSlideshowPager[options.slideshowID].top.type].transitionBegin == 'function') {
         Drupal[Drupal.settings.viewsSlideshowPager[options.slideshowID].top.type].transitionBegin(options);
-        if (Drupal.settings.viewsSlideshowPager[options.slideshowID].top.master_pager === 1) {
-          $.each(Drupal.settings.viewsSlideshow, function(i, obj) {
-            if (i != options.slideshowID) {
-              options.slideshowID = i;
-              options.action = 'goToSlide';
-              Drupal[Drupal.settings.viewsSlideshowPager[options.slideshowID].top.type].goToSlide(options);
-            }
-          });
-        }
       }
     }
     catch(err) {
@@ -164,17 +151,8 @@
     }
 
     try {
-      if (typeof Drupal.settings.viewsSlideshowPager != "undefined" && typeof Drupal.settings.viewsSlideshowPager[options.slideshowID].bottom.type != "undefined" && typeof Drupal[Drupal.settings.viewsSlideshowPager[options.slideshowID].bottom.type].transitionBegin == 'function') {
+      if (typeof Drupal.settings.viewsSlideshowPager[options.slideshowID].bottom.type != "undefined" && typeof Drupal[Drupal.settings.viewsSlideshowPager[options.slideshowID].bottom.type].transitionBegin == 'function') {
         Drupal[Drupal.settings.viewsSlideshowPager[options.slideshowID].bottom.type].transitionBegin(options);
-        if (Drupal.settings.viewsSlideshowPager[options.slideshowID].bottom.master_pager === 1) {
-          $.each(Drupal.settings.viewsSlideshow, function(i, obj) {
-            if (i != options.slideshowID) {
-              options.slideshowID = i;
-              options.action = 'goToSlide';
-              Drupal[Drupal.settings.viewsSlideshowPager[options.slideshowID].bottom.type].goToSlide(options);
-            }
-          });
-        }
       }
     }
     catch(err) {
@@ -265,7 +243,7 @@
    * Views Slideshow Pager Fields
    */
 
-  // Add views slideshow api calls for views slideshow pager fields.
+  // Add views slieshow api calls for views slideshow pager fields.
   Drupal.behaviors.viewsSlideshowPagerFields = {
     attach: function (context) {
       // Process pause on hover.
@@ -282,18 +260,19 @@
             var mouseIn = function() {
               Drupal.viewsSlideshow.action({ "action": 'goToSlide', "slideshowID": uniqueID, "slideNum": index });
               Drupal.viewsSlideshow.action({ "action": 'pause', "slideshowID": uniqueID });
-            };
-
+            }
+            
             var mouseOut = function() {
               Drupal.viewsSlideshow.action({ "action": 'play', "slideshowID": uniqueID });
-            };
-
+            }
+          
             if (jQuery.fn.hoverIntent) {
               $(pagerItem).hoverIntent(mouseIn, mouseOut);
             }
             else {
               $(pagerItem).hover(mouseIn, mouseOut);
             }
+            
           });
         }
         else {
@@ -320,6 +299,7 @@
       // Add active class to active pager.
       $('#views_slideshow_pager_field_item_'+ pagerLocation + '_' + options.slideshowID + '_' + options.slideNum).addClass('active');
     }
+
   };
 
   /**
@@ -406,7 +386,7 @@
     var status = {
       'value': true,
       'text': ''
-    };
+    }
 
     // If an action isn't specified return false.
     if (typeof options.action == 'undefined' || options.action == '') {

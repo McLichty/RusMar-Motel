@@ -1,15 +1,6 @@
 <?php
 
-/**
- * @file
- * Definition of ViewsUiFileManagedViewsWizard.
- */
-
-/**
- * Tests creating managed files views with the wizard.
- */
 class ViewsUiFileManagedViewsWizard extends ViewsUiBaseViewsWizard {
-
   protected function default_display_options($form, $form_state) {
     $display_options = parent::default_display_options($form, $form_state);
 
@@ -38,5 +29,4 @@ class ViewsUiFileManagedViewsWizard extends ViewsUiBaseViewsWizard {
 
     return $display_options;
   }
-
 }

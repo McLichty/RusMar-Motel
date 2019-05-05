@@ -1,21 +1,12 @@
 <?php
 
 /**
- * @file
- * Definition of views_handler_filter_vocabulary_vid.
- */
-
-/**
  * Filter by vocabulary id.
  *
  * @ingroup views_filter_handlers
  */
 class views_handler_filter_vocabulary_vid extends views_handler_filter_in_operator {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function get_value_options() {
+  function get_value_options() {
     if (isset($this->value_options)) {
       return;
     }
@@ -26,5 +17,4 @@ class views_handler_filter_vocabulary_vid extends views_handler_filter_in_operat
       $this->value_options[$voc->vid] = $voc->name;
     }
   }
-
 }

@@ -194,52 +194,28 @@ function theme_date_calendar_day($variables) {
 function theme_date_time_ago($variables) {
   $start_date = $variables['start_date'];
   $end_date = $variables['end_date'];
-  $use_end_date = isset($variables['use_end_date']) ? $variables['use_end_date'] : false;
   $interval = !empty($variables['interval']) ? $variables['interval'] : 2;
-  $display = isset($variables['interval_display']) ? $variables['interval_display'] : 'time ago';
 
   // If no date is sent, then return nothing.
   if (empty($start_date) || empty($end_date)) {
     return;
   }
 
-  // We use the end date only when the option is checked.
-  if ($use_end_date){
-    $date = date_format($end_date, DATE_FORMAT_UNIX);
-  }
-  else {
-    $date = date_format($start_date, DATE_FORMAT_UNIX);
-  }
-
   // Time to compare dates to.
+  $now = date_format(date_now(), DATE_FORMAT_DATETIME);
+  $start = date_format($start_date, DATE_FORMAT_DATETIME);
+  $end = date_format($end_date, DATE_FORMAT_DATETIME);
 
-  $now = date_format(date_now(), DATE_FORMAT_UNIX);
-
-  // Will be positive for a datetime in the past (ago), and negative for a datetime in the future (hence).
-  $time_diff = $now - $date;
-
-  // Uses the same options used by Views format_interval.
-  switch ($display) {
-    case 'raw time ago':
-      return format_interval($time_diff, $interval);
-
-    case 'time ago':
-      return t('%time ago', array('%time' => format_interval($time_diff, $interval)));
-
-    case 'raw time hence':
-      return format_interval(-$time_diff, $interval);
-
-    case 'time hence':
-      return t('%time hence', array('%time' => format_interval(-$time_diff, $interval)));
-
-    case 'raw time span':
-      return ($time_diff < 0 ? '-' : '') . format_interval(abs($time_diff), $interval);
-
-    case 'inverse time span':
-      return ($time_diff > 0 ? '-' : '') . format_interval(abs($time_diff), $interval);
-
-    case 'time span':
-      return t(($time_diff < 0 ? '%time hence' : '%time ago'), array('%time' => format_interval(abs($time_diff), $interval)));
-
+  // 1) The date is entirely in the future.
+  if ($now < $start) {
+    return t('!time from now', array('!time' => date_format_interval($start_date, $interval)));
+  }
+  // 2) Ongoing date.
+  elseif ($now > $start && $now <= $end) {
+    return t('ongoing');
+  }
+  // 3) Date is in the past (format_interval added 'ago' .to the value).
+  else {
+    return date_format_interval($start_date, $interval);
   }
 }

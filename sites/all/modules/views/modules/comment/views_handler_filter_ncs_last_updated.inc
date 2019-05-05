@@ -1,21 +1,11 @@
 <?php
-
 /**
- * @file
- * Definition of views_handler_filter_ncs_last_updated.
- */
-
-/**
- * Filter handler for the newer of last comment / node updated.
+ * Filter handler for the newer of last comment / node updated
  *
  * @ingroup views_filter_handlers
  */
 class views_handler_filter_ncs_last_updated extends views_handler_filter_date {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function query() {
+  function query() {
     $this->ensure_my_table();
     $this->node_table = $this->query->ensure_table('node', $this->relationship);
 
@@ -26,5 +16,4 @@ class views_handler_filter_ncs_last_updated extends views_handler_filter_date {
       $this->{$info[$this->operator]['method']}($field);
     }
   }
-
 }

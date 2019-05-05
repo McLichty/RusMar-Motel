@@ -1,39 +1,30 @@
 <?php
 
 /**
- * @file
- * Definition of views_handler_field_aggregator_category.
- */
-
-/**
  * Field handler to provide simple renderer that allows linking to aggregator
  * category.
  *
  * @ingroup views_field_handlers
  */
 class views_handler_field_aggregator_category extends views_handler_field {
-
   /**
    * Constructor to provide additional field to add.
    */
-  public function construct() {
+  function construct() {
     parent::construct();
     $this->additional_fields['cid'] = 'cid';
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function option_definition() {
+  function option_definition() {
     $options = parent::option_definition();
-    $options['link_to_category'] = array('default' => FALSE, 'bool' => TRUE);
+    $options['link_to_category'] = array('default' => FALSE);
     return $options;
   }
 
   /**
    * Provide link to category option
    */
-  public function options_form(&$form, &$form_state) {
+  function options_form(&$form, &$form_state) {
     $form['link_to_category'] = array(
       '#title' => t('Link this field to its aggregator category page'),
       '#description' => t('This will override any other link you have set.'),
@@ -48,7 +39,7 @@ class views_handler_field_aggregator_category extends views_handler_field {
    *
    * Data should be made XSS safe prior to calling this function.
    */
-  public function render_link($data, $values) {
+  function render_link($data, $values) {
     $cid = $this->get_value($values, 'cid');
     if (!empty($this->options['link_to_category']) && !empty($cid) && $data !== NULL && $data !== '') {
       $this->options['alter']['make_link'] = TRUE;
@@ -57,12 +48,8 @@ class views_handler_field_aggregator_category extends views_handler_field {
     return $data;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function render($values) {
+  function render($values) {
     $value = $this->get_value($values);
     return $this->render_link($this->sanitize_value($value), $values);
   }
-
 }

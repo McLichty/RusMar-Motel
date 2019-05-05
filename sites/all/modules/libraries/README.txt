@@ -1,3 +1,4 @@
+/* $Id: README.txt,v 1.2 2011/01/27 02:22:04 sun Exp $ */
 
 -- SUMMARY --
 
@@ -16,11 +17,7 @@ Bug reports, feature suggestions and latest developments:
 
 -- INSTALLATION --
 
-* Install as usual, see
-  https://www.drupal.org/documentation/install/modules-themes/modules-7 for
-  further information. Note that installing external libraries is separate from
-  installing this module and should happen in the sites/all/libraries directory.
-  See http://drupal.org/node/1440066 for more information.
+* Install as usual, see http://drupal.org/node/70151 for further information.
 
 
 -- CONTACT --

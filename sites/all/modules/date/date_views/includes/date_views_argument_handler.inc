@@ -3,14 +3,12 @@
  * @file
  * Date API views argument handler.
  * This argument combines multiple date arguments into a single argument
- * where all fields are controlled by the same date and can be combined
- * with either AND or OR.
+ * where all fields are controlled by the same date and can be combined with either AND or OR.
  */
 
 /**
  * Date API argument handler.
  */
-// @codingStandardsIgnoreStart
 class date_views_argument_handler extends date_views_argument_handler_simple {
 
   /**
@@ -152,9 +150,6 @@ class date_views_argument_handler extends date_views_argument_handler_simple {
     $this->query->set_where_group($this->options['date_method'], $this->options['date_group']);
     $this->granularity = $this->date_handler->arg_granularity($this->argument);
     $format = $this->date_handler->views_formats($this->granularity, 'sql');
-
-    $this->placeholders = array();
-
     if (!empty($this->query_fields)) {
       // Use set_where_group() with the selected date_method
       // of 'AND' or 'OR' to create the where clause.
@@ -166,7 +161,7 @@ class date_views_argument_handler extends date_views_argument_handler_simple {
         $this->table = $field['table_name'];
         $this->original_table = $field['table_name'];
         if ($field['table_name'] != $this->table || !empty($this->relationship)) {
-          $this->table = $this->query->ensure_table($field['table_name'], $this->relationship);
+          $this->table = $this->query->queue_table($field['table_name'], $this->relationship);
         }
         // $this->table_alias gets set when the first field is processed if otherwise empty.
         // For subsequent fields, we need to be sure it is emptied again.
@@ -174,8 +169,6 @@ class date_views_argument_handler extends date_views_argument_handler_simple {
           $this->table_alias = NULL;
         }
         parent::query($group_by);
-
-        $this->placeholders = array_merge($this->placeholders, $this->date_handler->placeholders);
       }
     }
   }
@@ -200,4 +193,3 @@ class date_views_argument_handler extends date_views_argument_handler_simple {
   }
 
 }
-// @codingStandardsIgnoreEnd

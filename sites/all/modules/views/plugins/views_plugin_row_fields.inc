@@ -1,12 +1,11 @@
 <?php
-
 /**
  * @file
- * Definition of views_plugin_row_fields.
+ * Contains the base row style plugin.
  */
 
 /**
- * The basic 'fields' row plugin.
+ * The basic 'fields' row plugin
  *
  * This displays fields one after another, giving options for inline
  * or not.
@@ -14,24 +13,20 @@
  * @ingroup views_row_plugins
  */
 class views_plugin_row_fields extends views_plugin_row {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function option_definition() {
+  function option_definition() {
     $options = parent::option_definition();
 
     $options['inline'] = array('default' => array());
     $options['separator'] = array('default' => '');
-    $options['hide_empty'] = array('default' => FALSE, 'bool' => TRUE);
-    $options['default_field_elements'] = array('default' => TRUE, 'bool' => TRUE);
+    $options['hide_empty'] = array('default' => FALSE);
+    $options['default_field_elements'] = array('default' => TRUE);
     return $options;
   }
 
   /**
    * Provide a form for setting options.
    */
-  public function options_form(&$form, &$form_state) {
+  function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
     $options = $this->display->handler->get_field_labels();
 
@@ -66,9 +61,6 @@ class views_plugin_row_fields extends views_plugin_row {
       '#size' => 10,
       '#default_value' => isset($this->options['separator']) ? $this->options['separator'] : '',
       '#description' => t('The separator may be placed between inline fields to keep them from squishing up next to each other. You can use HTML in this field.'),
-      '#dependency' => array(
-        'edit-row-options-default-field-elements' => array(1),
-      ),
     );
 
     $form['hide_empty'] = array(
@@ -84,8 +76,7 @@ class views_plugin_row_fields extends views_plugin_row {
    * Perform any necessary changes to the form values prior to storage.
    * There is no need for this function to actually store the data.
    */
-  public function options_submit(&$form, &$form_state) {
+  function options_submit(&$form, &$form_state) {
     $form_state['values']['row_options']['inline'] = array_filter($form_state['values']['row_options']['inline']);
   }
-
 }

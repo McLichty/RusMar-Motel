@@ -1,20 +1,15 @@
 <?php
-
 /**
  * @file
  * Generate configuration form and save settings.
  */
 
 /**
- * Configuration form for slider options.
+ * Implements hook_form().
  */
 function nivo_slider_option_configuration_form($form, &$form_state) {
   // Create a list of the currently available themes
-  $themes = module_invoke_all('nivo_slider_theme_info');
-
-  // Allow theme information to be altered
-  drupal_alter('nivo_slider_theme_info', $themes);
-
+  $themes = module_invoke_all('nivo_slider_theme');
   $available_themes = array();
 
   foreach ($themes as $theme => $properties) {
@@ -29,50 +24,6 @@ function nivo_slider_option_configuration_form($form, &$form_state) {
     '#default_value' => variable_get('nivo_slider_theme', 'default'),
     '#description' => t('Select a slider theme. The slider theme determines the overall appearance of the slider.'),
   );
-
-  // Display image style settings if the image module is available
-  if (module_exists('image') == TRUE) {
-    // Create a list of the currently available image styles
-    $image_styles = image_styles();
-    $available_themes = array();
-
-    foreach ($image_styles as $style => $properties) {
-      $available_image_styles[$style] = $properties['name'];
-    }
-
-    // Image Style
-    $form['nivo_slider_image_style'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Use image styles to generate slider images'),
-      '#default_value' => variable_get('nivo_slider_image_style', 0),
-      '#description' => t('Easily modify, scale, crop and apply various effects to slider images using <a href="@image-styles">Image styles</a>.', array('@image-styles' => '/admin/config/media/image-styles')),
-    );
-    $form['nivo_slider_image_style_slide'] = array(
-      '#type' => 'select',
-      '#title' => t('Slide image style'),
-      '#options' => $available_image_styles,
-      '#default_value' => variable_get('nivo_slider_image_style_slide', 'large'),
-      '#description' => t('Select an image style to apply to slide images.'),
-      '#states' => array(
-        'visible' => array(
-          ':input[name="nivo_slider_image_style"]' => array('checked' => TRUE),
-        ),
-      ),
-    );
-    $form['nivo_slider_image_style_thumb'] = array(
-      '#type' => 'select',
-      '#title' => t('Tumbnail image style'),
-      '#options' => $available_image_styles,
-      '#default_value' => variable_get('nivo_slider_image_style_thumb', 'thumbnail'),
-      '#description' => t('Select an image style to apply to slide thumbnail images.'),
-      '#states' => array(
-        'visible' => array(
-          ':input[name="nivo_slider_image_style"]' => array('checked' => TRUE),
-        ),
-      ),
-    );
-  }
-
   // General
   $form['general'] = array(
     '#type' => 'fieldset',
@@ -80,16 +31,14 @@ function nivo_slider_option_configuration_form($form, &$form_state) {
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
-  $form['general']['nivo_slider_dir_name'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Nivo slider images directory'),
-    '#default_value' => variable_get('nivo_slider_dir_name', 'banner'),
-    '#description' => t('Fill the name of the directory where you want to store images. Default is "banner"'),
-  );
   $form['general']['nivo_slider_random_start'] = array(
-    '#type' => 'checkbox',
+    '#type' => 'radios',
     '#title' => t('Use a random starting slide'),
-    '#default_value' => variable_get('nivo_slider_random_start', 1),
+    '#options' => array(
+      'true' => t('Yes'),
+      'false' => t('No'),
+    ),
+    '#default_value' => variable_get('nivo_slider_random_start', 'true'),
     '#description' => t('Randomly select a slide to begin the slideshow with.'),
   );
   $form['general']['nivo_slider_start_slide'] = array(
@@ -102,11 +51,18 @@ function nivo_slider_option_configuration_form($form, &$form_state) {
     '#field_prefix' => t('Slide #'),
     '#states' => array(
       'visible' => array(
-        ':input[name="nivo_slider_random_start"]' => array('checked' => FALSE),
+        ':input[name="nivo_slider_random_start"]' => array('value' => 'false'),
       ),
     ),
   );
-
+  $form['general']['nivo_slider_caption_opacity'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Caption opacity'),
+    '#maxlength' => 3,
+    '#size' => 3,
+    '#default_value' => variable_get('nivo_slider_caption_opacity', '0.8'),
+    '#description' => t('Specify the transparency of slide captions. Enter a number between 0 and 1 where 0 is fully transparent and 1 is fully opaque.'),
+  );
   // Effects
   $form['effects'] = array(
     '#type' => 'fieldset',
@@ -152,21 +108,6 @@ function nivo_slider_option_configuration_form($form, &$form_state) {
     '#default_value' => variable_get('nivo_slider_slices', '15'),
     '#description' => t('Used for slice animations.'),
     '#field_suffix' => t('Slices'),
-    '#states' => array(
-      'visible' => array(
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'sliceDown')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'sliceDownLeft')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'sliceUp')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'sliceUpLeft')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'sliceUpDown')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'sliceUpDownLeft')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'fold')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'fade')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'random')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'slideInRight')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'slideInLeft')),
-      ),
-    ),
   );
   $form['effects']['effect_properties']['nivo_slider_box_columns'] = array(
     '#type' => 'textfield',
@@ -176,15 +117,6 @@ function nivo_slider_option_configuration_form($form, &$form_state) {
     '#default_value' => variable_get('nivo_slider_box_columns', '8'),
     '#description' => t('Used for box animations.'),
     '#field_suffix' => t('Columns'),
-    '#states' => array(
-      'visible' => array(
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'boxRandom')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'boxRain')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'boxRainReverse')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'boxRainGrow')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'boxRainGrowReverse')),
-      ),
-    ),
   );
   $form['effects']['effect_properties']['nivo_slider_box_rows'] = array(
     '#type' => 'textfield',
@@ -194,15 +126,6 @@ function nivo_slider_option_configuration_form($form, &$form_state) {
     '#default_value' => variable_get('nivo_slider_box_rows', '4'),
     '#description' => t('Used for box animations.'),
     '#field_suffix' => t('Rows'),
-    '#states' => array(
-      'visible' => array(
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'boxRandom')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'boxRain')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'boxRainReverse')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'boxRainGrow')),
-        array(':input[name="nivo_slider_effect"]' => array('value' => 'boxRainGrowReverse')),
-      ),
-    ),
   );
   $form['effects']['nivo_slider_animation_speed'] = array(
     '#type' => 'textfield',
@@ -214,12 +137,15 @@ function nivo_slider_option_configuration_form($form, &$form_state) {
     '#field_suffix' => t('ms'),
   );
   $form['effects']['nivo_slider_pause_on_hover'] = array(
-    '#type' => 'checkbox',
+    '#type' => 'radios',
     '#title' => t('Pause animation when hovering over the slide'),
-    '#default_value' => variable_get('nivo_slider_pause_on_hover', 1),
+    '#options' => array(
+      'true' => t('Yes'),
+      'false' => t('No'),
+    ),
+    '#default_value' => variable_get('nivo_slider_pause_on_hover', 'true'),
     '#description' => t('Disable slide transitions while the user is hovering over the slide.'),
   );
-
   // Navigation
   $form['navigation'] = array(
     '#type' => 'fieldset',
@@ -228,9 +154,13 @@ function nivo_slider_option_configuration_form($form, &$form_state) {
     '#collapsed' => TRUE,
   );
   $form['navigation']['nivo_slider_directional_navigation'] = array(
-    '#type' => 'checkbox',
+    '#type' => 'radios',
     '#title' => t('Display directional navigation'),
-    '#default_value' => variable_get('nivo_slider_directional_navigation', 1),
+    '#options' => array(
+      'true' => t('Yes'),
+      'false' => t('No'),
+    ),
+    '#default_value' => variable_get('nivo_slider_directional_navigation', 'true'),
     '#description' => t('Display navigation buttons to go back to the previous slide and move forward to the next slide.'),
   );
   $form['navigation']['nivo_slider_next_text'] = array(
@@ -239,7 +169,7 @@ function nivo_slider_option_configuration_form($form, &$form_state) {
     '#default_value' => variable_get('nivo_slider_next_text', t('Next')),
     '#states' => array(
       'visible' => array(
-        ':input[name="nivo_slider_directional_navigation"]' => array('checked' => TRUE),
+        ':input[name="nivo_slider_directional_navigation"]' => array('value' => 'true'),
       ),
     ),
   );
@@ -249,31 +179,68 @@ function nivo_slider_option_configuration_form($form, &$form_state) {
     '#default_value' => variable_get('nivo_slider_previous_text', t('Prev')),
     '#states' => array(
       'visible' => array(
-        ':input[name="nivo_slider_directional_navigation"]' => array('checked' => TRUE),
+        ':input[name="nivo_slider_directional_navigation"]' => array('value' => 'true'),
+      ),
+    ),
+  );
+  $form['navigation']['nivo_slider_directional_navigation_hide'] = array(
+    '#type' => 'radios',
+    '#title' => t('Only display directional navigation on hover'),
+    '#options' => array(
+      'true' => t('Yes'),
+      'false' => t('No'),
+    ),
+    '#default_value' => variable_get('nivo_slider_directional_navigation_hide', 'true'),
+    '#description' => t('Hide the directional navigation buttons until the user hovers over the slide.'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="nivo_slider_directional_navigation"]' => array('value' => 'true'),
       ),
     ),
   );
   $form['navigation']['nivo_slider_control_navigation'] = array(
-    '#type' => 'checkbox',
+    '#type' => 'radios',
     '#title' => t('Display control navigation'),
-    '#default_value' => variable_get('nivo_slider_control_navigation', 1),
+    '#options' => array(
+      'true' => t('Yes'),
+      'false' => t('No'),
+    ),
+    '#default_value' => variable_get('nivo_slider_control_navigation', 'true'),
     '#description' => t('Display navigation buttons to select an individual slide.'),
   );
   $form['navigation']['nivo_slider_control_nav_thumbs'] = array(
-    '#type' => 'checkbox',
+    '#type' => 'radios',
     '#title' => t('Use thumbnails for control navigation'),
-    '#default_value' => variable_get('nivo_slider_control_nav_thumbs', 0),
-    '#description' => t('Use thumbnails of each slide as control navigation buttons. In order for thumbnails to be displayed, a compatible theme is required.'),
+    '#options' => array(
+      'true' => t('Yes'),
+      'false' => t('No'),
+    ),
+    '#default_value' => variable_get('nivo_slider_control_nav_thumbs', 'false'),
+    '#description' => t('Use thumbnails of each slide as control navigation buttons.'),
     '#states' => array(
       'visible' => array(
-        ':input[name="nivo_slider_control_navigation"]' => array('checked' => TRUE),
+        ':input[name="nivo_slider_control_navigation"]' => array('value' => 'true'),
       ),
     ),
   );
+  $form['navigation']['nivo_slider_keyboard_navigation'] = array(
+    '#type' => 'radios',
+    '#title' => t('Enable keyboard navigation'),
+    '#options' => array(
+      'true' => t('Yes'),
+      'false' => t('No'),
+    ),
+    '#default_value' => variable_get('nivo_slider_keyboard_navigation', 'true'),
+    '#description' => t('Allow slideshow navigation using the left and right keyboard arrow keys.'),
+  );
   $form['navigation']['nivo_slider_manual_advance'] = array(
-    '#type' => 'checkbox',
+    '#type' => 'radios',
     '#title' => t('Disable automatic slide transitions'),
-    '#default_value' => variable_get('nivo_slider_manual_advance', 0),
+    '#options' => array(
+      'true' => t('Yes'),
+      'false' => t('No'),
+    ),
+    '#default_value' => variable_get('nivo_slider_manual_advance', 'false'),
     '#description' => t('For the use to manually navigate between slides.'),
   );
   $form['navigation']['nivo_slider_pause_time'] = array(
@@ -286,10 +253,17 @@ function nivo_slider_option_configuration_form($form, &$form_state) {
     '#field_suffix' => t('ms'),
     '#states' => array(
       'visible' => array(
-        ':input[name="nivo_slider_manual_advance"]' => array('checked' => FALSE),
+        ':input[name="nivo_slider_manual_advance"]' => array('value' => 'false'),
       ),
     ),
   );
 
   return system_settings_form($form);
+}
+
+function nivo_slider_option_configuration_form_validate($form, &$form_state) {
+  // Opacity must be between 0 and 1
+  if ($form_state['values']['nivo_slider_caption_opacity'] < 0 || $form_state['values']['nivo_slider_caption_opacity'] > 1) {
+    form_set_error('nivo_slider_caption_opacity', t('Caption opacity must be between 0 and 1.'));
+  }
 }

@@ -2,9 +2,14 @@
 
 /**
  * @file
- * Provide views data and handlers for translation.module.
  *
- * @ingroup views_module_handlers
+ * Provide views data and handlers for translation.module
+ */
+
+/**
+ * @defgroup views_translation_module translation.module handlers
+ *
+ * @{
  */
 
 /**
@@ -13,13 +18,34 @@
  * Add translation information to the node table.
  */
 function translation_views_data_alter(&$data) {
-  // Joins.
+
+  // Joins
   $data['node']['table']['join']['node'] = array(
     'left_field' => 'tnid',
     'field' => 'tnid',
   );
 
-  // The translation ID (nid of the "source" translation).
+  // Language field
+  $data['node']['language'] = array(
+    'group' => t('Content translation'),
+    'title' => t('Language'),
+    'help' => t('The language the content is in.'),
+    'field' => array(
+      'handler' => 'views_handler_field_node_language',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_node_language',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_node_language',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
+  // The translation ID (nid of the "source" translation)
   $data['node']['tnid'] = array(
     'group' => t('Content translation'),
     'title' => t('Translation set node ID'),
@@ -33,8 +59,7 @@ function translation_views_data_alter(&$data) {
     ),
     'argument' => array(
       'handler' => 'views_handler_argument_node_tnid',
-      // The field to display in the summary.
-      'name field' => 'title',
+      'name field' => 'title', // the field to display in the summary.
       'numeric' => TRUE,
       'validate type' => 'tnid',
     ),
@@ -51,7 +76,7 @@ function translation_views_data_alter(&$data) {
     ),
   );
 
-  // All translations.
+  // The source translation.
   $data['node']['translation'] = array(
     'group' => t('Content translation'),
     'title' => t('Translations'),
@@ -62,7 +87,7 @@ function translation_views_data_alter(&$data) {
       'base' => 'node',
       'base field' => 'tnid',
       'relationship table' => 'node',
-      'relationship field' => 'tnid',
+      'relationship field' => 'nid',
       'handler' => 'views_handler_relationship_translation',
       'label' => t('Translations'),
     ),
@@ -78,7 +103,7 @@ function translation_views_data_alter(&$data) {
     ),
   );
 
-  // Child translation.
+  // The source translation.
   $data['node']['child_translation'] = array(
     'group' => t('Node translation'),
     'title' => t('Child translation'),
@@ -88,7 +113,7 @@ function translation_views_data_alter(&$data) {
     ),
   );
 
-  // Translation status.
+  // Translation status
   $data['node']['translate'] = array(
     'group' => t('Content translation'),
     'title' => t('Translation status'),
@@ -117,4 +142,9 @@ function translation_views_data_alter(&$data) {
     ),
   );
 
+
 }
+
+/**
+ * @}
+ */

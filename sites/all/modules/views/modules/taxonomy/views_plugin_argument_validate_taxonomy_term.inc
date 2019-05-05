@@ -1,19 +1,14 @@
 <?php
-
 /**
  * @file
- * Definition of views_plugin_argument_validate_taxonomy_term.
+ * Contains the 'taxonomy term' argument validator plugin.
  */
 
 /**
  * Validate whether an argument is an acceptable node.
  */
 class views_plugin_argument_validate_taxonomy_term extends views_plugin_argument_validate {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function init(&$view, &$argument, $options) {
+  function init(&$view, &$argument, $options) {
     parent::init($view, $argument, $options);
 
     // Convert legacy vids option to machine name vocabularies.
@@ -27,22 +22,16 @@ class views_plugin_argument_validate_taxonomy_term extends views_plugin_argument
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function option_definition() {
+  function option_definition() {
     $options = parent::option_definition();
     $options['vocabularies'] = array('default' => array());
     $options['type'] = array('default' => 'tid');
-    $options['transform'] = array('default' => FALSE, 'bool' => TRUE);
+    $options['transform'] = array('default' => FALSE);
 
     return $options;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function options_form(&$form, &$form_state) {
+  function options_form(&$form, &$form_state) {
     $vocabularies = taxonomy_get_vocabularies();
     $options = array();
     foreach ($vocabularies as $voc) {
@@ -79,18 +68,12 @@ class views_plugin_argument_validate_taxonomy_term extends views_plugin_argument
     );
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function options_submit(&$form, &$form_state, &$options = array()) {
+  function options_submit(&$form, &$form_state, &$options = array()) {
     // Filter unselected items so we don't unnecessarily store giant arrays.
     $options['vocabularies'] = array_filter($options['vocabularies']);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function convert_options(&$options) {
+  function convert_options(&$options) {
     if (!isset($options['vocabularies']) && !empty($this->argument->options['validate_argument_vocabulary'])) {
       $options['vocabularies'] = $this->argument->options['validate_argument_vocabulary'];
       $options['type'] = $this->argument->options['validate_argument_type'];
@@ -98,10 +81,7 @@ class views_plugin_argument_validate_taxonomy_term extends views_plugin_argument
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function validate_argument($argument) {
+  function validate_argument($argument) {
     $vocabularies = array_filter($this->options['vocabularies']);
     $type = $this->options['type'];
     $transform = $this->options['transform'];
@@ -115,15 +95,15 @@ class views_plugin_argument_validate_taxonomy_term extends views_plugin_argument
         $query = db_select('taxonomy_term_data', 'td');
         $query->leftJoin('taxonomy_vocabulary', 'tv', 'td.vid = tv.vid');
         $query->fields('td');
+        $query->fields('tv', array('machine_name'));
         $query->condition('td.tid', $argument);
-        $query->addTag('taxonomy_term_access');
+        $query->addTag('term_access');
         $term = $query->execute()->fetchObject();
         if (!$term) {
           return FALSE;
         }
-        $term = taxonomy_term_load($term->tid);
-        $this->argument->validated_title = check_plain(entity_label('taxonomy_term', $term));
-        return empty($vocabularies) || !empty($vocabularies[$term->vocabulary_machine_name]);
+        $this->argument->validated_title = check_plain($term->name);
+        return empty($vocabularies) || !empty($vocabularies[$term->machine_name]);
 
       case 'tids':
         // An empty argument is not a term so doesn't pass.
@@ -141,7 +121,7 @@ class views_plugin_argument_validate_taxonomy_term extends views_plugin_argument
         $test = drupal_map_assoc($tids->value);
         $titles = array();
 
-        // check, if some tids already verified.
+        // check, if some tids already verified
         static $validated_cache = array();
         foreach ($test as $tid) {
           if (isset($validated_cache[$tid])) {
@@ -155,10 +135,9 @@ class views_plugin_argument_validate_taxonomy_term extends views_plugin_argument
           }
         }
 
-        // if unverified tids left - verify them and cache results.
+        // if unverified tids left - verify them and cache results
         if (count($test)) {
           $query = db_select('taxonomy_term_data', 'td');
-          $query->addTag('taxonomy_term_access');
           $query->leftJoin('taxonomy_vocabulary', 'tv', 'td.vid = tv.vid');
           $query->fields('td');
           $query->fields('tv', array('machine_name'));
@@ -171,13 +150,13 @@ class views_plugin_argument_validate_taxonomy_term extends views_plugin_argument
               $validated_cache[$term->tid] = FALSE;
               return FALSE;
             }
-            $term = taxonomy_term_load($term->tid);
-            $titles[] = $validated_cache[$term->tid] = check_plain(entity_label('taxonomy_term', $term));
+
+            $titles[] = $validated_cache[$term->tid] = check_plain($term->name);
             unset($test[$term->tid]);
           }
         }
 
-        // Remove duplicate titles.
+        // Remove duplicate titles
         $titles = array_unique($titles);
 
         $this->argument->validated_title = implode($tids->operator == 'or' ? ' + ' : ', ', $titles);
@@ -187,7 +166,6 @@ class views_plugin_argument_validate_taxonomy_term extends views_plugin_argument
       case 'name':
       case 'convert':
         $query = db_select('taxonomy_term_data', 'td');
-        $query->addTag('taxonomy_term_access');
         $query->leftJoin('taxonomy_vocabulary', 'tv', 'td.vid = tv.vid');
         $query->fields('td');
         $query->fields('tv', array('machine_name'));
@@ -206,18 +184,14 @@ class views_plugin_argument_validate_taxonomy_term extends views_plugin_argument
           if ($type == 'convert') {
             $this->argument->argument = $term->tid;
           }
-          $term = taxonomy_term_load($term->tid);
-          $this->argument->validated_title = check_plain(entity_label('taxonomy_term', $term));
+          $this->argument->validated_title = check_plain($term->name);
           return TRUE;
         }
         return FALSE;
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function process_summary_arguments(&$args) {
+  function process_summary_arguments(&$args) {
     $type = $this->options['type'];
     $transform = $this->options['transform'];
     $vocabularies = array_filter($this->options['vocabularies']);
@@ -226,7 +200,6 @@ class views_plugin_argument_validate_taxonomy_term extends views_plugin_argument
       $arg_keys = array_flip($args);
 
       $query = db_select('taxonomy_term_data', 'td');
-      $query->addTag('taxonomy_term_access');
       $query->condition('tid', $args);
       $query->addField('td', 'tid', 'tid');
       if (!empty($vocabularies)) {
@@ -245,5 +218,4 @@ class views_plugin_argument_validate_taxonomy_term extends views_plugin_argument
       }
     }
   }
-
 }

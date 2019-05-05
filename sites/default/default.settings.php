@@ -668,11 +668,3 @@ $conf['file_scan_ignore_directories'] = array(
   'node_modules',
   'bower_components',
 );
-
-/**
- * Include a local settings file if it exists.
- */
-$local_settings = dirname(__FILE__) . '/settings.local.php';
-if (file_exists($local_settings)) {
-  include_once $local_settings;
-}

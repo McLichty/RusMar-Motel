@@ -1,15 +1,6 @@
 <?php
 
-/**
- * @file
- * Definition of ViewsUiUsersViewsWizard.
- */
-
-/**
- * Tests creating user views with the wizard.
- */
 class ViewsUiUsersViewsWizard extends ViewsUiBaseViewsWizard {
-
   protected function default_display_options($form, $form_state) {
     $display_options = parent::default_display_options($form, $form_state);
 
@@ -40,5 +31,4 @@ class ViewsUiUsersViewsWizard extends ViewsUiBaseViewsWizard {
 
     return $display_options;
   }
-
 }

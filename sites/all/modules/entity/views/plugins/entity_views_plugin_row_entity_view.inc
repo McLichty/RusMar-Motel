@@ -67,7 +67,7 @@ class entity_views_plugin_row_entity_view extends views_plugin_row {
     return $form;
   }
 
-  public function pre_render($values) {
+  public function pre_render(&$values) {
     if (!empty($values)) {
       list($this->entity_type, $this->entities) = $this->view->query->get_result_entities($values, !empty($this->relationship) ? $this->relationship : NULL, isset($this->field_alias) ? $this->field_alias : NULL);
     }
@@ -88,9 +88,6 @@ class entity_views_plugin_row_entity_view extends views_plugin_row {
 
   public function render($values) {
     if ($entity = $this->get_value($values)) {
-      // Add the view object as views_plugin_row_node_view::render() would.
-      // Otherwise the views theme suggestions won't work properly.
-      $entity->view = $this->view;
       $render = $this->rendered_content[entity_id($this->entity_type, $entity)];
       return drupal_render($render);
     }

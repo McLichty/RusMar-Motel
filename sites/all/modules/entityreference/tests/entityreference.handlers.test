@@ -1,11 +1,6 @@
 <?php
 
 /**
- * @file
- * Contains EntityReferenceHandlersTestCase
- */
-
-/**
  * Test for Entity Reference handlers.
  */
 class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
@@ -27,18 +22,10 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
     foreach ($tests as $test) {
       foreach ($test['arguments'] as $arguments) {
         $result = call_user_func_array(array($handler, 'getReferencableEntities'), $arguments);
-        $this->assertEqual($result, $test['result'], format_string('Valid result set returned by @handler.', array('@handler' => $handler_name)));
+        $this->assertEqual($result, $test['result'], t('Valid result set returned by @handler.', array('@handler' => $handler_name)));
 
         $result = call_user_func_array(array($handler, 'countReferencableEntities'), $arguments);
-        if (!empty($test['result'])) {
-          $bundle = key($test['result']);
-          $count = count($test['result'][$bundle]);
-        }
-        else {
-          $count = 0;
-        }
-
-        $this->assertEqual($result, $count, format_string('Valid count returned by @handler.', array('@handler' => $handler_name)));
+        $this->assertEqual($result, count($test['result']), t('Valid count returned by @handler.', array('@handler' => $handler_name)));
       }
     }
   }
@@ -64,40 +51,31 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
     );
 
     // Build a set of test data.
-    // Titles contain HTML-special characters to test escaping.
     $nodes = array(
       'published1' => (object) array(
         'type' => 'article',
         'status' => 1,
-        'title' => 'Node published1 (<&>)',
+        'title' => 'Node published1',
         'uid' => 1,
       ),
       'published2' => (object) array(
         'type' => 'article',
         'status' => 1,
-        'title' => 'Node published2 (<&>)',
+        'title' => 'Node published2',
         'uid' => 1,
       ),
       'unpublished' => (object) array(
         'type' => 'article',
         'status' => 0,
-        'title' => 'Node unpublished (<&>)',
-        'uid' => 1,
-      ),
-      // Title purposefully starts with same characters as published1 and
-      // published2 above but contains a slash.
-      'published_withslash' => (object) array(
-        'type' => 'article',
-        'status' => 1,
-        'title' => 'Node pub/lished1',
+        'title' => 'Node unpublished',
         'uid' => 1,
       ),
     );
 
     $node_labels = array();
-    foreach ($nodes as $key => $node) {
+    foreach ($nodes as $node) {
       node_save($node);
-      $node_labels[$key] = check_plain($node->title);
+      $node_labels[$node->nid] = $node->title;
     }
 
     // Test as a non-admin.
@@ -109,11 +87,8 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
           array(NULL, 'CONTAINS'),
         ),
         'result' => array(
-          'article' => array(
-            $nodes['published1']->nid => $node_labels['published1'],
-            $nodes['published2']->nid => $node_labels['published2'],
-            $nodes['published_withslash']->nid => $node_labels['published_withslash'],
-          ),
+          $nodes['published1']->nid => $nodes['published1']->title,
+          $nodes['published2']->nid => $nodes['published2']->title,
         ),
       ),
       array(
@@ -122,9 +97,7 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
           array('Published1', 'CONTAINS'),
         ),
         'result' => array(
-          'article' => array(
-            $nodes['published1']->nid => $node_labels['published1'],
-          ),
+          $nodes['published1']->nid => $nodes['published1']->title,
         ),
       ),
       array(
@@ -133,9 +106,7 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
           array('Published2', 'CONTAINS'),
         ),
         'result' => array(
-          'article' => array(
-            $nodes['published2']->nid => $node_labels['published2'],
-          ),
+          $nodes['published2']->nid => $nodes['published2']->title,
         ),
       ),
       array(
@@ -150,18 +121,6 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
         ),
         'result' => array(),
       ),
-      // Searching for "Node pub/" should return only the published_withslash node
-      // and not published1 and published2 from above.
-      array(
-        'arguments' => array(
-          array('Node pub/', 'CONTAINS'),
-        ),
-        'result' => array(
-          'article' => array(
-            $nodes['published_withslash']->nid => $node_labels['published_withslash'],
-          ),
-        ),
-      ),
     );
     $this->assertReferencable($field, $referencable_tests, 'Node handler');
 
@@ -174,12 +133,9 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
           array(NULL, 'CONTAINS'),
         ),
         'result' => array(
-          'article' => array(
-            $nodes['published1']->nid => $node_labels['published1'],
-            $nodes['published2']->nid => $node_labels['published2'],
-            $nodes['published_withslash']->nid => $node_labels['published_withslash'],
-            $nodes['unpublished']->nid => $node_labels['unpublished'],
-          ),
+          $nodes['published1']->nid => $nodes['published1']->title,
+          $nodes['published2']->nid => $nodes['published2']->title,
+          $nodes['unpublished']->nid => $nodes['unpublished']->title,
         ),
       ),
       array(
@@ -187,28 +143,11 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
           array('Node unpublished', 'CONTAINS'),
         ),
         'result' => array(
-          'article' => array(
-            $nodes['unpublished']->nid => $node_labels['unpublished'],
-          ),
+          $nodes['unpublished']->nid => $nodes['unpublished']->title,
         ),
       ),
     );
     $this->assertReferencable($field, $referencable_tests, 'Node handler (admin)');
-
-    // Verify autocomplete input validation.
-    $handler = entityreference_get_selection_handler($field);
-    $element = array(
-      '#parents' => array('element_name'),
-    );
-    $form_state = array();
-    $form = array();
-    $value = $handler->validateAutocompleteInput($nodes['published1']->title, $element, $form_state, $form);
-    $this->assertEqual($value, $nodes['published1']->nid);
-
-    $invalid_input = $this->randomName();
-    $value = $handler->validateAutocompleteInput($invalid_input, $element, $form_state, $form);
-    $this->assertNull($value);
-    $this->assertEqual(form_get_error($element), t('There are no entities matching "%value"', array('%value' => $invalid_input)));
   }
 
   /**
@@ -236,14 +175,14 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
       'anonymous' => user_load(0),
       'admin' => user_load(1),
       'non_admin' => (object) array(
-        'name' => 'non_admin <&>',
+        'name' => 'non_admin',
         'mail' => 'non_admin@example.com',
         'roles' => array(),
         'pass' => user_password(),
         'status' => 1,
       ),
       'blocked' => (object) array(
-        'name' => 'blocked <&>',
+        'name' => 'blocked',
         'mail' => 'blocked@example.com',
         'roles' => array(),
         'pass' => user_password(),
@@ -259,7 +198,7 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
       if (!isset($user->uid)) {
         $users[$key] = $user = user_save(drupal_anonymous_user(), (array) $user);
       }
-      $user_labels[$key] = check_plain($user->name);
+      $user_labels[$user->uid] = $user->name;
     }
 
     // Test as a non-admin.
@@ -270,10 +209,8 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
           array(NULL, 'CONTAINS'),
         ),
         'result' => array(
-          'user' => array(
-            $users['admin']->uid => ENTITYREFERENCE_DENIED,
-            $users['non_admin']->uid => $user_labels['non_admin'],
-          ),
+          $users['admin']->uid => $users['admin']->name,
+          $users['non_admin']->uid => $users['non_admin']->name,
         ),
       ),
       array(
@@ -282,9 +219,7 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
           array('NON_ADMIN', 'CONTAINS'),
         ),
         'result' => array(
-          'user' => array(
-            $users['non_admin']->uid => $user_labels['non_admin'],
-          ),
+          $users['non_admin']->uid => $users['non_admin']->name,
         ),
       ),
       array(
@@ -309,12 +244,10 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
           array(NULL, 'CONTAINS'),
         ),
         'result' => array(
-          'user' => array(
-            $users['anonymous']->uid => $user_labels['anonymous'],
-            $users['admin']->uid => $user_labels['admin'],
-            $users['non_admin']->uid => $user_labels['non_admin'],
-            $users['blocked']->uid => $user_labels['blocked'],
-          ),
+          $users['anonymous']->uid => $users['anonymous']->name,
+          $users['admin']->uid => $users['admin']->name,
+          $users['non_admin']->uid => $users['non_admin']->name,
+          $users['blocked']->uid => $users['blocked']->name,
         ),
       ),
       array(
@@ -322,9 +255,7 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
           array('blocked', 'CONTAINS'),
         ),
         'result' => array(
-          'user' => array(
-            $users['blocked']->uid => $user_labels['blocked'],
-          ),
+          $users['blocked']->uid => $users['blocked']->name,
         ),
       ),
       array(
@@ -333,9 +264,7 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
           array('anonymous', 'CONTAINS'),
         ),
         'result' => array(
-          'user' => array(
-            $users['anonymous']->uid => $user_labels['anonymous'],
-          ),
+          $users['anonymous']->uid => $users['anonymous']->name,
         ),
       ),
     );
@@ -388,7 +317,7 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
         'cid' => NULL,
         'pid' => 0,
         'status' => COMMENT_PUBLISHED,
-        'subject' => 'Comment Published <&>',
+        'subject' => 'Comment Published',
         'hostname' => ip_address(),
         'language' => LANGUAGE_NONE,
       ),
@@ -398,7 +327,7 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
         'cid' => NULL,
         'pid' => 0,
         'status' => COMMENT_NOT_PUBLISHED,
-        'subject' => 'Comment Unpublished <&>',
+        'subject' => 'Comment Unpublished',
         'hostname' => ip_address(),
         'language' => LANGUAGE_NONE,
       ),
@@ -408,16 +337,16 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
         'cid' => NULL,
         'pid' => 0,
         'status' => COMMENT_NOT_PUBLISHED,
-        'subject' => 'Comment Published on Unpublished node <&>',
+        'subject' => 'Comment Published on Unpublished node',
         'hostname' => ip_address(),
         'language' => LANGUAGE_NONE,
       ),
     );
 
     $comment_labels = array();
-    foreach ($comments as $key => $comment) {
+    foreach ($comments as $comment) {
       comment_save($comment);
-      $comment_labels[$key] = check_plain($comment->subject);
+      $comment_labels[$comment->cid] = $comment->subject;
     }
 
     // Test as a non-admin.
@@ -429,9 +358,7 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
           array(NULL, 'CONTAINS'),
         ),
         'result' => array(
-          'comment_node_article' => array(
-            $comments['published_published']->cid => $comment_labels['published_published'],
-          ),
+          $comments['published_published']->cid => $comments['published_published']->subject,
         ),
       ),
       array(
@@ -439,9 +366,7 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
           array('Published', 'CONTAINS'),
         ),
         'result' => array(
-          'comment_node_article' => array(
-            $comments['published_published']->cid => $comment_labels['published_published'],
-          ),
+          $comments['published_published']->cid => $comments['published_published']->subject,
         ),
       ),
       array(
@@ -468,10 +393,8 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
           array(NULL, 'CONTAINS'),
         ),
         'result' => array(
-          'comment_node_article' => array(
-            $comments['published_published']->cid => $comment_labels['published_published'],
-            $comments['published_unpublished']->cid => $comment_labels['published_unpublished'],
-          ),
+          $comments['published_published']->cid => $comments['published_published']->subject,
+          $comments['published_unpublished']->cid => $comments['published_unpublished']->subject,
         ),
       ),
     );
@@ -486,127 +409,12 @@ class EntityReferenceHandlersTestCase extends DrupalWebTestCase {
           array(NULL, 'CONTAINS'),
         ),
         'result' => array(
-          'comment_node_article' => array(
-            $comments['published_published']->cid => $comment_labels['published_published'],
-            $comments['published_unpublished']->cid => $comment_labels['published_unpublished'],
-            $comments['unpublished_published']->cid => $comment_labels['unpublished_published'],
-          ),
+          $comments['published_published']->cid => $comments['published_published']->subject,
+          $comments['published_unpublished']->cid => $comments['published_unpublished']->subject,
+          $comments['unpublished_published']->cid => $comments['unpublished_published']->subject,
         ),
       ),
     );
     $this->assertReferencable($field, $referencable_tests, 'Comment handler (comment + node admin)');
-  }
-
-  /**
-   * Assert sorting by field works for non-admins.
-   *
-   * Since we are sorting on a field, we need to make sure the base-table
-   * is added, and access-control is behaving as expected.
-   */
-  public function testSortByField() {
-    // Add text field to entity, to sort by.
-    $field_info = array(
-      'field_name' => 'field_text',
-      'type' => 'text',
-      'entity_types' => array('node'),
-    );
-    field_create_field($field_info);
-
-    $instance = array(
-      'label' => 'Text Field',
-      'field_name' => 'field_text',
-      'entity_type' => 'node',
-      'bundle' => 'article',
-      'settings' => array(),
-      'required' => FALSE,
-    );
-    field_create_instance($instance);
-
-
-    // Build a fake field instance.
-    $field = array(
-      'translatable' => FALSE,
-      'entity_types' => array(),
-      'settings' => array(
-        'handler' => 'base',
-        'target_type' => 'node',
-        'handler_settings' => array(
-          'target_bundles' => array(),
-          // Add sorting.
-          'sort' => array(
-            'type' => 'field',
-            'field' => 'field_text:value',
-            'direction' => 'DESC',
-          ),
-        ),
-      ),
-      'field_name' => 'test_field',
-      'type' => 'entityreference',
-      'cardinality' => '1',
-    );
-
-    // Build a set of test data.
-    $nodes = array(
-      'published1' => (object) array(
-        'type' => 'article',
-        'status' => 1,
-        'title' => 'Node published1 (<&>)',
-        'uid' => 1,
-        'field_text' => array(
-          LANGUAGE_NONE => array(
-            array(
-              'value' => 1,
-            ),
-          ),
-        ),
-      ),
-      'published2' => (object) array(
-        'type' => 'article',
-        'status' => 1,
-        'title' => 'Node published2 (<&>)',
-        'uid' => 1,
-        'field_text' => array(
-          LANGUAGE_NONE => array(
-            array(
-              'value' => 2,
-            ),
-          ),
-        ),
-      ),
-      'unpublished' => (object) array(
-        'type' => 'article',
-        'status' => 0,
-        'title' => 'Node unpublished (<&>)',
-        'uid' => 1,
-        'field_text' => array(
-          LANGUAGE_NONE => array(
-            array(
-              'value' => 3,
-            ),
-          ),
-        ),
-      ),
-    );
-
-    $node_labels = array();
-    foreach ($nodes as $key => $node) {
-      node_save($node);
-      $node_labels[$key] = check_plain($node->title);
-    }
-
-    // Test as a non-admin.
-    $normal_user = $this->drupalCreateUser(array('access content'));
-    $GLOBALS['user'] = $normal_user;
-
-    $handler = entityreference_get_selection_handler($field);
-
-    // Not only assert the result, but make sure the keys are sorted as
-    // expected.
-    $result = $handler->getReferencableEntities();
-    $expected_result = array(
-      $nodes['published2']->nid => $node_labels['published2'],
-      $nodes['published1']->nid => $node_labels['published1'],
-    );
-    $this->assertIdentical($result['article'], $expected_result, 'Query sorted by field returned expected values for non-admin.');
   }
 }

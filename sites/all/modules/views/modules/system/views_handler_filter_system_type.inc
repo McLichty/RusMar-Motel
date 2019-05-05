@@ -1,19 +1,10 @@
 <?php
 
 /**
- * @file
- * Definition of views_handler_filter_system_type.
- */
-
-/**
  * Filter by system type.
  */
 class views_handler_filter_system_type extends views_handler_filter_in_operator {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function get_value_options() {
+  function get_value_options() {
     if (!isset($this->value_options)) {
       $this->value_title = t('Type');
       // Enable filtering by type.
@@ -22,5 +13,4 @@ class views_handler_filter_system_type extends views_handler_filter_in_operator 
       $this->value_options = $types;
     }
   }
-
 }

@@ -1,44 +1,31 @@
 <?php
-
 /**
- * @file
- * Definition of views_handler_field_user_name.
- */
-
-/**
- * Field handler for a simple renderer that allows using a themed user link.
+ * Field handler to provide simple renderer that allows using a themed user link.
  *
  * @ingroup views_field_handlers
  */
 class views_handler_field_user_name extends views_handler_field_user {
-
   /**
    * Add uid in the query so we can test for anonymous if needed.
    */
-  public function init(&$view, &$data) {
+  function init(&$view, &$data) {
     parent::init($view, $data);
     if (!empty($this->options['overwrite_anonymous']) || !empty($this->options['format_username'])) {
       $this->additional_fields['uid'] = 'uid';
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function option_definition() {
+  function option_definition() {
     $options = parent::option_definition();
 
-    $options['overwrite_anonymous'] = array('default' => FALSE, 'bool' => TRUE);
+    $options['overwrite_anonymous'] = array('default' => FALSE);
     $options['anonymous_text'] = array('default' => '', 'translatable' => TRUE);
-    $options['format_username'] = array('default' => TRUE, 'bool' => TRUE);
+    $options['format_username'] = array('default' => TRUE);
 
     return $options;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function options_form(&$form, &$form_state) {
+  function options_form(&$form, &$form_state) {
     $form['format_username'] = array(
       '#title' => t('Use formatted username'),
       '#type' => 'checkbox',
@@ -66,10 +53,7 @@ class views_handler_field_user_name extends views_handler_field_user {
     parent::options_form($form, $form_state);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function render_link($data, $values) {
+  function render_link($data, $values) {
     $account = new stdClass();
     $account->uid = $this->get_value($values, 'uid');
     $account->name = $this->get_value($values);
@@ -84,11 +68,10 @@ class views_handler_field_user_name extends views_handler_field_user {
       }
     }
     // If we want a formatted username, do that.
-    if (!empty($this->options['format_username']) && !is_null($account->uid)) {
+    if (!empty($this->options['format_username'])) {
       return format_username($account);
     }
     // Otherwise, there's no special handling, so return the data directly.
     return $data;
   }
-
 }

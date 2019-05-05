@@ -21,12 +21,18 @@ function token_requirements($phase = 'runtime') {
         $problems = array_unique($problem['problems']);
         $problems = array_map('check_plain', $problems);
         $token_problems[$problem_key] = $problem['label'] . theme('item_list', array('items' => $problems));
-        $requirements['token-' . $problem_key] = array(
-          'title' => $problem['label'],
-          'value' => theme('item_list', array('items' => $problems)),
-          'severity' => $problem['severity'],
-        );
       }
+      else {
+        unset($token_problems[$problem_key]);
+      }
+    }
+    if (!empty($token_problems)) {
+      $requirements['token_problems'] = array(
+        'title' => $t('Tokens'),
+        'value' => $t('Problems detected'),
+        'severity' => REQUIREMENT_WARNING,
+        'description' => '<p>' . implode('</p><p>', $token_problems) . '</p>', //theme('item_list', array('items' => $token_problems)),
+      );
     }
   }
 
@@ -46,11 +52,9 @@ function token_schema() {
  * Add the cache_token table.
  */
 function token_update_7000() {
-  if (!db_table_exists('cache_token')) {
-    $schema = drupal_get_schema_unprocessed('system', 'cache');
-    $schema['description'] = 'Cache table for token information.';
-    db_create_table('cache_token', $schema);
-  }
+  $schema['cache_token'] = drupal_get_schema_unprocessed('system', 'cache');
+  $schema['cache_token']['description'] = 'Cache table for token information.';
+  db_create_table('cache_token', $schema['cache_token']);
 }
 
 /**
@@ -214,11 +218,11 @@ function _token_upgrade_token_date_list($old_token, $new_token) {
  * @return
  *   A string with the tokens upgraded
  *
- * @see _token_upgrade_token_list()
+ * @see _token_upgrade_token_list();
  */
 function token_update_token_text($text, $updates = array(), $leading = '[', $trailing = ']') {
   $updates += _token_upgrade_token_list();
-  $regex = '/' . preg_quote($leading, '/') . '([^\s]*)' . preg_quote($trailing, '/') . '/';
+  $regex = '/' . preg_quote($leading, '/') . '([^\s]*)' . preg_quote($trailing, '/') . ']/';
   preg_match_all($regex, $text, $matches);
 
   foreach ($matches[1] as $index => $old_token) {
@@ -266,24 +270,19 @@ function token_get_token_problems() {
   $token_info = token_info();
   $token_problems = array(
     'not-array' => array(
-      'label' => t('Tokens or token types not defined as arrays'),
-      'severity' => REQUIREMENT_ERROR,
+      'label' => t('The following tokens or token types are not defined as arrays:'),
     ),
     'missing-info' => array(
-      'label' => t('Tokens or token types missing name property'),
-      'severity' => REQUIREMENT_WARNING,
+      'label' => t('The following tokens or token types are missing required name and description information:'),
     ),
     'type-no-tokens' => array(
-      'label' => t('Token types do not have any tokens defined'),
-      'severity' => REQUIREMENT_INFO,
+      'label' => t('The following token types do not have any tokens defined:'),
     ),
     'tokens-no-type' => array(
-      'label' => t('Token types are not defined but have tokens'),
-      'severity' => REQUIREMENT_INFO,
+      'label' => t('The following token types are not defined but have tokens:'),
     ),
     'duplicate' => array(
-      'label' => t('Token or token types are defined by multiple modules'),
-      'severity' => REQUIREMENT_ERROR,
+      'label' => t('The following token or token types are defined by multiple modules:')
     ),
   );
 
@@ -294,11 +293,8 @@ function token_get_token_problems() {
       $token_problems['not-array']['problems'][] = "\$info['types']['$type']";
       continue;
     }
-    elseif (!isset($type_info['name'])) {
+    elseif (!isset($type_info['name']) || !isset($type_info['description'])) {
       $token_problems['missing-info']['problems'][] = "\$info['types']['$type']";
-    }
-    elseif (is_array($type_info['name'])) {
-      $token_problems['duplicate']['problems'][] = "\$info['types']['$type']";
     }
     elseif (empty($token_info['tokens'][$real_type])) {
       $token_problems['type-no-tokens']['problems'][] = "\$info['tokens']['$real_type']";
@@ -317,10 +313,10 @@ function token_get_token_problems() {
           $token_problems['not-array']['problems'][] = "\$info['tokens']['$type']['$token']";
           continue;
         }
-        elseif (!isset($tokens[$token]['name'])) {
+        elseif (!isset($tokens[$token]['name']) || !isset($tokens[$token]['description'])) {
           $token_problems['missing-info']['problems'][] = "\$info['tokens']['$type']['$token']";
         }
-        elseif (is_array($tokens[$token]['name'])) {
+        elseif (is_array($tokens[$token]['name']) || is_array($tokens[$token]['description'])) {
           $token_problems['duplicate']['problems'][] = "\$info['tokens']['$type']['$token']";
         }
       }

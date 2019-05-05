@@ -6,8 +6,6 @@
  */
 
 /**
- * Implements hook_form().
- *
  * @todo.
  */
 function date_tools_wizard_form() {
@@ -61,10 +59,7 @@ function date_tools_wizard_form() {
   $form['field']['repeat'] = array(
     '#type' => 'select',
     '#default_value' => 0,
-    '#options' => array(
-      0 => t('No'),
-      1 => t('Yes'),
-    ),
+    '#options' => array(0 => t('No'), 1 => t('Yes')),
     '#title' => t('Show repeating date options'),
     '#access' => module_exists('date_repeat_field'),
   );
@@ -77,11 +72,7 @@ function date_tools_wizard_form() {
   $form['field']['advanced']['todate'] = array(
     '#type' => 'select',
     '#default_value' => 'optional',
-    '#options' => array(
-      '' => t('Never'),
-      'optional' => t('Optional'),
-      'required' => t('Required'),
-    ),
+    '#options' => array('' => t('Never'), 'optional' => t('Optional'), 'required' => t('Required')),
     '#title' => t('End Date'),
     '#description' => t("Display a matching second date field as a 'End date'."),
   );
@@ -114,11 +105,8 @@ function date_tools_wizard_form() {
   );
   $form['calendar'] = array(
     '#type' => 'select',
-    '#default_value' => module_exists('calendar'),
-    '#options' => array(
-      0 => t('No'),
-      1 => t('Yes'),
-    ),
+    '#default_value' => 1,
+    '#options' => array(0 => t('No'), 1 => t('Yes')),
     '#title' => t('Create a calendar for this date field'),
     '#access' => module_exists('calendar'),
   );
@@ -127,30 +115,18 @@ function date_tools_wizard_form() {
     '#type' => 'submit',
     '#value' => t('Save'),
   );
+
   return $form;
 }
 
 /**
- * Form validate.
- *
  * @todo.
  */
 function date_tools_wizard_form_validate(&$form, &$form_state) {
   $bundle = $form_state['values']['bundle'];
   $field_name = 'field_' . $form_state['values']['field_name'];
-
-  $args = array(
-    ':field_name' => $field_name,
-    ':bundle' => $bundle,
-    ':entity_type' => 'node',
-  );
-
-  $query = "SELECT type FROM {node_type} WHERE type=:bundle";
-  $existing_type = db_query($query, array(':bundle' => $args[':bundle']))->fetchField();
-
-  $query = "SELECT field_name FROM {field_config_instance} WHERE field_name=:field_name AND bundle=:bundle AND entity_type=:entity_type";
-  $existing_instance = db_query($query, $args)->fetchField();
-
+  $existing_type = db_query("SELECT type FROM {node_type} WHERE type=:bundle", array(':bundle' => $bundle))->fetchField();
+  $existing_instance = db_query("SELECT field_name FROM {field_config_instance} WHERE field_name=:field_name AND bundle=:bundle AND entity_type=:entity_type", array(':field_name' => $field_name, ':bundle' => $bundle, ':entity_type' => 'node'))->fetchField();
   if ($existing_type) {
     drupal_set_message(t('This content type name already exists, adding new field to existing content type.'));
   }
@@ -172,8 +148,6 @@ function date_tools_wizard_form_validate(&$form, &$form_state) {
 }
 
 /**
- * Form submit.
- *
  * @todo.
  */
 function date_tools_wizard_form_submit(&$form, &$form_state) {
@@ -188,8 +162,6 @@ function date_tools_wizard_form_submit(&$form, &$form_state) {
 }
 
 /**
- * Wizard build.
- *
  * @todo.
  */
 function date_tools_wizard_build($form_values) {
@@ -197,6 +169,10 @@ function date_tools_wizard_build($form_values) {
 
   $field_name = 'field_' . $field_name;
   $base_table = 'node';
+
+  if (!empty($repeat)) {
+    $widget_type .= '_repeat';
+  }
 
   // Create a node type if it doesn't already exist.
   // This makes it possible to add additional date fields to
@@ -230,7 +206,7 @@ function date_tools_wizard_build($form_values) {
       'timezone_db' => date_get_timezone_db($tz_handling),
       'repeat' => $repeat,
       'todate' => !empty($todate) ? $todate : 'optional',
-    ),
+      ),
   );
   $instance = array(
     'entity_type' => 'node',
@@ -293,7 +269,7 @@ function date_tools_wizard_build($form_values) {
 
   $field = field_create_field($field);
   $instance = field_create_instance($instance);
-  $view_name = 'calendar_node_' . $field_name;
+  $view_name = 'calendar_' . $base_table . '_' . $field_name;
 
   field_info_cache_clear(TRUE);
   field_cache_clear(TRUE);
@@ -304,8 +280,6 @@ function date_tools_wizard_build($form_values) {
 }
 
 /**
- * Includes handler.
- *
  * @todo.
  */
 function date_tools_wizard_include() {
@@ -316,8 +290,6 @@ function date_tools_wizard_include() {
 }
 
 /**
- * Implements hook_field_types().
- *
  * @todo.
  */
 function date_tools_wizard_field_types() {
@@ -329,7 +301,6 @@ function date_tools_wizard_field_types() {
 }
 
 /**
- * Implements hook_widget_types().
  * @todo.
  */
 function date_tools_wizard_widget_types() {
@@ -343,8 +314,6 @@ function date_tools_wizard_widget_types() {
 }
 
 /**
- * Tz handler.
- *
  * @todo.
  */
 function date_tools_wizard_tz_handling() {
@@ -353,8 +322,6 @@ function date_tools_wizard_tz_handling() {
 }
 
 /**
- * Create date tools wizard content type.
- *
  * @todo.
  */
 function date_tools_wizard_create_content_type($name, $bundle, $description, $type_settings = array()) {
@@ -370,7 +337,8 @@ function date_tools_wizard_create_content_type($name, $bundle, $description, $ty
     'body_label' => 'Body',
     'min_word_count' => '0',
     'help' => '',
-    'node_options' => array(
+    'node_options' =>
+    array(
       'status' => 1,
       'promote' => 1,
       'sticky' => 0,
@@ -411,10 +379,8 @@ function date_tools_wizard_create_content_type($name, $bundle, $description, $ty
       'weight' => -4,
       'module' => 'text',
     ),
-    'settings' => array(
-      'display_summary' => TRUE,
-    ),
-    'display' => array(
+    'settings' => array('display_summary' => TRUE),
+     'display' => array(
       'default' => array(
         'label' => 'hidden',
         'type' => 'text_default',

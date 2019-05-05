@@ -1,31 +1,31 @@
 <?php
-
 /**
  * @file
- * Definition of views_plugin_row.
+ * Contains the base row style plugin.
  */
 
 /**
- * @defgroup views_row_plugins Views row plugins
+ * @defgroup views_row_plugins Views' row plugins
  * @{
- * Row plugins control how Views outputs an individual record.
  *
- * They are tightly coupled to style plugins, in that a style plugin is what
- * calls the row plugin.
+ * Row plugins control how Views outputs an individual record. They are
+ * tightly coupled to style plugins, in that a style plugin is what calls
+ * the row plugin.
  *
- * @see hook_views_plugins()
+ * @see hook_views_plugins
  */
 
 /**
- * Default plugin to view a single row of a table. This is really just a wrapper
- * around a theme function.
+ * Default plugin to view a single row of a table. This is really just a wrapper around
+ * a theme function.
+ *
+ * @ingroup views_row_plugins
  */
 class views_plugin_row extends views_plugin {
-
   /**
-   * {@inheritdoc}
+   * Initialize the row plugin.
    */
-  public function init(&$view, &$display, $options = NULL) {
+  function init(&$view, &$display, $options = NULL) {
     $this->view = &$view;
     $this->display = &$display;
 
@@ -33,17 +33,12 @@ class views_plugin_row extends views_plugin {
     $this->unpack_options($this->options, isset($options) ? $options : $display->handler->get_option('row_options'));
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function uses_fields() {
+  function uses_fields() {
     return !empty($this->definition['uses fields']);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function option_definition() {
+
+  function option_definition() {
     $options = parent::option_definition();
     if (isset($this->base_table)) {
       $options['relationship'] = array('default' => 'none');
@@ -55,7 +50,7 @@ class views_plugin_row extends views_plugin {
   /**
    * Provide a form for setting options.
    */
-  public function options_form(&$form, &$form_state) {
+  function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
     if (isset($this->base_table)) {
       $view = &$form_state['view'];
@@ -104,20 +99,15 @@ class views_plugin_row extends views_plugin {
   /**
    * Validate the options form.
    */
-  public function options_validate(&$form, &$form_state) {
-  }
+  function options_validate(&$form, &$form_state) { }
 
   /**
    * Perform any necessary changes to the form values prior to storage.
    * There is no need for this function to actually store the data.
    */
-  public function options_submit(&$form, &$form_state) {
-  }
+  function options_submit(&$form, &$form_state) { }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function query() {
+  function query() {
     if (isset($this->base_table)) {
       if (isset($this->options['relationship']) && isset($this->view->relationship[$this->options['relationship']])) {
         $relationship = $this->view->relationship[$this->options['relationship']];
@@ -132,23 +122,16 @@ class views_plugin_row extends views_plugin {
   /**
    * Allow the style to do stuff before each row is rendered.
    *
-   * @param array $result
+   * @param $result
    *   The full array of results from the query.
    */
-  public function pre_render($result) {
-  }
+  function pre_render($result) { }
 
   /**
    * Render a row object. This usually passes through to a theme template
    * of some form, but not always.
-   *
-   * @param stdClass $row
-   *   A single row of the query result, so an element of $view->result.
-   *
-   * @return string
-   *   The rendered output of a single row, used by the style plugin.
    */
-  public function render($row) {
+  function render($row) {
     return theme($this->theme_functions(),
       array(
         'view' => $this->view,
@@ -157,7 +140,6 @@ class views_plugin_row extends views_plugin {
         'field_alias' => isset($this->field_alias) ? $this->field_alias : '',
       ));
   }
-
 }
 
 /**

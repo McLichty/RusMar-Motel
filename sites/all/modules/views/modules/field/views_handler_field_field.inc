@@ -1,11 +1,6 @@
 <?php
 
 /**
- * @file
- * Definition of views_handler_field_field.
- */
-
-/**
  * Helper function: Return an array of formatter options for a field type.
  *
  * Borrowed from field_ui.
@@ -33,58 +28,20 @@ function _field_view_formatter_options($field_type = NULL) {
 }
 
 /**
- * A field that displays fieldapi fields.
- *
- * @ingroup views_field_handlers
+ * A field that displays fields.
  */
 class views_handler_field_field extends views_handler_field {
-
   /**
    * An array to store field renderable arrays for use by render_items.
-   *
-   * @var array
    */
   public $items = array();
 
   /**
-   * Store the field information.
-   *
-   * @var array
+   * Store the field informations.
    */
   public $field_info = array();
 
-  /**
-   * Does the field supports multiple field values.
-   *
-   * @var bool
-   */
-  public $multiple;
-
-  /**
-   * Does the rendered fields get limited.
-   *
-   * @var bool
-   */
-  public $limit_values;
-
-  /**
-   * A shortcut for $view->base_table.
-   *
-   * @var string
-   */
-  public $base_table;
-
-  /**
-   * Store the field instance.
-   *
-   * @var array
-   */
-  public $instance;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function init(&$view, &$options) {
+  function init(&$view, &$options) {
     parent::init($view, $options);
 
     $this->field_info = $field = field_info_field($this->definition['field_name']);
@@ -100,51 +57,38 @@ class views_handler_field_field extends views_handler_field {
         $this->limit_values = TRUE;
       }
 
-      // If "First and last only" is chosen, limit the values.
+      // If "First and last only" is chosen, limit the values
       if (!empty($this->options['delta_first_last'])) {
         $this->limit_values = TRUE;
       }
 
-      // Otherwise, we only limit values if the user hasn't selected "all", 0,
-      // or the value matching field cardinality.
+      // Otherwise, we only limit values if the user hasn't selected "all", 0, or
+      // the value matching field cardinality.
       if ((intval($this->options['delta_limit']) && ($this->options['delta_limit'] != $field['cardinality'])) || intval($this->options['delta_offset'])) {
         $this->limit_values = TRUE;
       }
     }
-
-    // Convert old style entity id group column to new format.
-    // @todo Remove for next major version.
-    if ($this->options['group_column'] == 'entity id') {
-      $this->options['group_column'] = 'entity_id';
-    }
   }
 
   /**
-   * Check whether current user has access to this handler.
-   *
-   * @return bool
-   *   Return TRUE if the user has access to view this field.
+   * Return TRUE if the user has access to view this field.
    */
-  public function access() {
+  function access() {
     $base_table = $this->get_base_table();
     return field_access('view', $this->field_info, $this->definition['entity_tables'][$base_table]);
   }
 
   /**
    * Set the base_table and base_table_alias.
-   *
-   * @return string
-   *   The base table which is used in the current view "context".
    */
-  public function get_base_table() {
+  function get_base_table() {
     if (!isset($this->base_table)) {
       // This base_table is coming from the entity not the field.
       $this->base_table = $this->view->base_table;
 
       // If the current field is under a relationship you can't be sure that the
-      // base table of the view is the base table of the current field. For
-      // example, a field from a node author on a node view does have users as
-      // base table.
+      // base table of the view is the base table of the current field.
+      // For example a field from a node author on a node view does have users as base table.
       if (!empty($this->options['relationship']) && $this->options['relationship'] != 'none') {
         $relationships = $this->view->display_handler->get_option('relationships');
         if (!empty($relationships[$this->options['relationship']])) {
@@ -169,7 +113,7 @@ class views_handler_field_field extends views_handler_field {
    * The 'add fields to query' switch is used by modules which need all data
    * present in the query itself (such as "sphinx").
    */
-  public function query($use_groupby = FALSE) {
+  function query($use_groupby = FALSE) {
     $this->get_base_table();
 
     $params = array();
@@ -206,8 +150,8 @@ class views_handler_field_field extends views_handler_field {
       $this->aliases['entity_id'] = $this->query->add_field($this->base_table_alias, $entity_info['entity keys']['id'], '', $params);
     }
 
-    // The alias needs to be unique, so we use both the field table and the
-    // entity type.
+
+    // The alias needs to be unique, so we use both the field table and the entity type.
     $entity_type_alias = $this->definition['table'] . '_' . $entity_type . '_entity_type';
     $this->aliases['entity_type'] = $this->query->add_field(NULL, "'$entity_type'", $entity_type_alias);
 
@@ -226,12 +170,12 @@ class views_handler_field_field extends views_handler_field {
         $options = array($this->options['group_column'] => $this->options['group_column']);
       }
 
-      $options += is_array($this->options['group_columns']) ? $this->options['group_columns'] : array();
+      $options += $this->options['group_columns'];
+
 
       $fields = array();
       $rkey = $this->definition['is revision'] ? 'FIELD_LOAD_REVISION' : 'FIELD_LOAD_CURRENT';
-      // Go through the list and determine the actual column name from field
-      // API.
+      // Go through the list and determine the actual column name from field api.
       foreach ($options as $column) {
         $name = $column;
         if (isset($this->field_info['storage']['details']['sql'][$rkey][$this->table][$column])) {
@@ -253,8 +197,7 @@ class views_handler_field_field extends views_handler_field {
       $field = $this->field_info;
       if (field_is_translatable($entity_type, $field) && !empty($this->view->display_handler->options['field_language_add_to_query'])) {
         $column = $this->table_alias . '.language';
-        // By the same reason as field_language the field might be
-        // LANGUAGE_NONE in reality so allow it as well.
+        // By the same reason as field_language the field might be LANGUAGE_NONE in reality so allow it as well.
         // @see this::field_language()
         global $language_content;
         $default_language = language_default('language');
@@ -263,8 +206,7 @@ class views_handler_field_field extends views_handler_field {
                                 $this->view->display_handler->options['field_language']);
         $placeholder = $this->placeholder();
         $language_fallback_candidates = array($language);
-        if (variable_get('locale_field_language_fallback', TRUE)) {
-          require_once DRUPAL_ROOT . '/includes/language.inc';
+        if (variable_get('locale_field_language_fallback', TRUE) && module_exists('locale')) {
           $language_fallback_candidates = array_merge($language_fallback_candidates, language_fallback_get_candidates());
         }
         else {
@@ -287,7 +229,7 @@ class views_handler_field_field extends views_handler_field {
   /**
    * Determine if the field table should be added to the query.
    */
-  public function add_field_table($use_groupby) {
+  function add_field_table($use_groupby) {
     // Grouping is enabled, or we are explicitly required to do this.
     if ($use_groupby || !empty($this->definition['add fields to query'])) {
       return TRUE;
@@ -302,7 +244,7 @@ class views_handler_field_field extends views_handler_field {
   /**
    * Determine if this field is click sortable.
    */
-  public function click_sortable() {
+  function click_sortable() {
     // Not click sortable in any case.
     if (empty($this->definition['click sortable'])) {
       return FALSE;
@@ -319,7 +261,7 @@ class views_handler_field_field extends views_handler_field {
   /**
    * Called to determine what to tell the clicksorter.
    */
-  public function click_sort($order) {
+  function click_sort($order) {
     // No column selected, can't continue.
     if (empty($this->options['click_sort_column'])) {
       return;
@@ -334,10 +276,7 @@ class views_handler_field_field extends views_handler_field {
     $this->query->add_orderby(NULL, NULL, $order, $this->aliases[$column]);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function option_definition() {
+  function option_definition() {
     $options = parent::option_definition();
 
     // option_definition runs before init/construct, so no $this->field_info
@@ -373,7 +312,6 @@ class views_handler_field_field extends views_handler_field {
     // Options used for multiple value fields.
     $options['group_rows'] = array(
       'default' => TRUE,
-      'bool' => TRUE,
     );
     // If we know the exact number of allowed values, then that can be
     // the default. Otherwise, default to 'all'.
@@ -385,36 +323,26 @@ class views_handler_field_field extends views_handler_field {
     );
     $options['delta_reversed'] = array(
       'default' => FALSE,
-      'bool' => TRUE,
     );
     $options['delta_first_last'] = array(
       'default' => FALSE,
-      'bool' => TRUE,
-    );
-    $options['delta_random'] = array(
-      'default' => FALSE,
-      'bool' => TRUE,
     );
 
     $options['multi_type'] = array(
-      'default' => 'separator',
+      'default' => 'separator'
     );
     $options['separator'] = array(
-      'default' => ', ',
+      'default' => ', '
     );
 
     $options['field_api_classes'] = array(
       'default' => FALSE,
-      'bool' => TRUE,
     );
 
     return $options;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function options_form(&$form, &$form_state) {
+  function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
 
     $field = $this->field_info;
@@ -436,7 +364,7 @@ class views_handler_field_field extends views_handler_field {
     else {
       $form['click_sort_column'] = array(
         '#type' => 'select',
-        '#title' => t('Column used for click sorting'),
+        '#title' => t('Click sort column'),
         '#options' => drupal_map_assoc($column_names),
         '#default_value' => $this->options['click_sort_column'],
         '#description' => t('Used by Style: Table to determine the actual column to click sort the field on. The default is usually fine.'),
@@ -477,10 +405,10 @@ class views_handler_field_field extends views_handler_field {
 
     // Provide an instance array for hook_field_formatter_settings_form().
     ctools_include('fields');
-    $this->instance = ctools_fields_fake_field_instance($this->definition['field_name'], '_custom', $formatter, $settings);
+    $instance = ctools_fields_fake_field_instance($this->definition['field_name'], '_dummy', $formatter, $settings);
 
-    // Store the settings in a '_custom' view mode.
-    $this->instance['display']['_custom'] = array(
+    // Store the settings in a '_dummy' view mode.
+    $instance['display']['_dummy'] = array(
       'type' => $format,
       'settings' => $settings,
     );
@@ -489,7 +417,7 @@ class views_handler_field_field extends views_handler_field {
     $settings_form = array('#value' => array());
     $function = $formatter['module'] . '_field_formatter_settings_form';
     if (function_exists($function)) {
-      $settings_form = $function($field, $this->instance, '_custom', $form, $form_state);
+      $settings_form = $function($field, $instance, '_dummy', $form, $form_state);
     }
     $form['settings'] = $settings_form;
   }
@@ -497,7 +425,7 @@ class views_handler_field_field extends views_handler_field {
   /**
    * Provide options for multiple value fields.
    */
-  public function multiple_options_form(&$form, &$form_state) {
+  function multiple_options_form(&$form, &$form_state) {
     $field = $this->field_info;
 
     $form['multiple_field_settings'] = array(
@@ -591,14 +519,6 @@ class views_handler_field_field extends views_handler_field {
       '#title' => t('First and last only'),
       '#type' => 'checkbox',
       '#default_value' => $this->options['delta_first_last'],
-      '#suffix' => $suffix,
-      '#dependency' => array('edit-options-group-rows' => array(TRUE)),
-      '#fieldset' => 'multiple_field_settings',
-    );
-    $form['delta_random'] = array(
-      '#title' => t('Random order'),
-      '#type' => 'checkbox',
-      '#default_value' => $this->options['delta_random'],
       '#suffix' => '</div>',
       '#dependency' => array('edit-options-group-rows' => array(TRUE)),
       '#fieldset' => 'multiple_field_settings',
@@ -608,7 +528,7 @@ class views_handler_field_field extends views_handler_field {
   /**
    * Extend the groupby form with group columns.
    */
-  public function groupby_form(&$form, &$form_state) {
+  function groupby_form(&$form, &$form_state) {
     parent::groupby_form($form, $form_state);
     // With "field API" fields, the column target of the grouping function
     // and any additional grouping columns must be specified.
@@ -636,10 +556,7 @@ class views_handler_field_field extends views_handler_field {
     );
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function groupby_form_submit(&$form, &$form_state) {
+  function groupby_form_submit(&$form, &$form_state) {
     parent::groupby_form_submit($form, $form_state);
     $item =& $form_state['handler']->options;
 
@@ -651,13 +568,13 @@ class views_handler_field_field extends views_handler_field {
   /**
    * Load the entities for all fields that are about to be displayed.
    */
-  public function post_execute(&$values) {
+  function post_execute(&$values) {
     if (!empty($values)) {
       // Divide the entity ids by entity type, so they can be loaded in bulk.
       $entities_by_type = array();
       $revisions_by_type = array();
       foreach ($values as $key => $object) {
-        if (isset($this->aliases['entity_type']) && isset($object->{$this->aliases['entity_type']}) && isset($object->{$this->field_alias}) && !isset($values[$key]->_field_data[$this->field_alias])) {
+        if (isset($object->{$this->field_alias}) && !isset($values[$key]->_field_data[$this->field_alias])) {
           $entity_type = $object->{$this->aliases['entity_type']};
           if (empty($this->definition['is revision'])) {
             $entity_id = $object->{$this->field_alias};
@@ -704,8 +621,7 @@ class views_handler_field_field extends views_handler_field {
         }
       }
 
-      // Now, transfer the data back into the resultset so it can be easily
-      // used.
+      // Now, transfer the data back into the resultset so it can be easily used.
       foreach ($values as $row_id => &$value) {
         $value->{'field_' . $this->options['id']} = $this->set_items($value, $row_id);
       }
@@ -718,7 +634,7 @@ class views_handler_field_field extends views_handler_field {
    * When using advanced render, each possible item in the list is rendered
    * individually. Then the items are all pasted together.
    */
-  public function render_items($items) {
+  function render_items($items) {
     if (!empty($items)) {
       if (!$this->options['group_rows']) {
         return implode('', $items);
@@ -732,27 +648,17 @@ class views_handler_field_field extends views_handler_field {
           array(
             'items' => $items,
             'title' => NULL,
-            'type' => $this->options['multi_type'],
+            'type' => $this->options['multi_type']
           ));
       }
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function get_items($values) {
+  function get_items($values) {
     return $values->{'field_' . $this->options['id']};
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function get_value($values, $field = NULL) {
-    if (!isset($values->_field_data[$this->field_alias]['entity']) || !is_object($values->_field_data[$this->field_alias]['entity'])) {
-      return array();
-    }
-
+  function get_value($values, $field = NULL) {
     // Go ahead and render and store in $this->items.
     $entity = clone $values->_field_data[$this->field_alias]['entity'];
 
@@ -778,7 +684,7 @@ class views_handler_field_field extends views_handler_field {
         }
       }
 
-      // If any of our aggregated fields have data, fake it.
+      // If any of our aggregated fields have data, fake it:
       if ($data) {
         // Now, overwrite the original value with our aggregated value.
         // This overwrites it so there is always just one entry.
@@ -792,11 +698,6 @@ class views_handler_field_field extends views_handler_field {
     // The field we are trying to display doesn't exist on this entity.
     if (!isset($entity->{$this->definition['field_name']})) {
       return array();
-    }
-
-    // If requested, randomize the order of the deltas.
-    if ($this->options['delta_random'] && !empty($entity->{$this->definition['field_name']})) {
-      shuffle($entity->{$this->definition['field_name']}[$langcode]);
     }
 
     // We are supposed to show only certain deltas.
@@ -829,7 +730,7 @@ class views_handler_field_field extends views_handler_field {
         }
       }
 
-      // Determine if only the first and last values should be shown.
+      // Determine if only the first and last values should be shown
       $delta_first_last = $this->options['delta_first_last'];
 
       $new_values = array();
@@ -837,8 +738,7 @@ class views_handler_field_field extends views_handler_field {
         $new_delta = $offset + $i;
 
         if (isset($all_values[$new_delta])) {
-          // If first-last option was selected, only use the first and last
-          // values.
+          // If first-last option was selected, only use the first and last values
           if (!$delta_first_last
             // Use the first value.
             || $new_delta == $offset
@@ -862,11 +762,8 @@ class views_handler_field_field extends views_handler_field {
   /**
    * Return an array of items for the field.
    */
-  public function set_items($values, $row_id) {
-    // In some cases the instance on the entity might be easy, see
-    // https://drupal.org/node/1161708 and https://drupal.org/node/1461536 for
-    // more information.
-    if (empty($values->_field_data[$this->field_alias]) || empty($values->_field_data[$this->field_alias]['entity']) || !isset($values->_field_data[$this->field_alias]['entity']->{$this->definition['field_name']})) {
+  function set_items($values, $row_id) {
+    if (empty($values->_field_data[$this->field_alias]) || empty($values->_field_data[$this->field_alias]['entity'])) {
       return array();
     }
 
@@ -880,6 +777,7 @@ class views_handler_field_field extends views_handler_field {
       'views_row_id' => $row_id,
     );
 
+
     $entity_type = $values->_field_data[$this->field_alias]['entity_type'];
     $entity = $this->get_value($values, 'entity');
     if (!$entity) {
@@ -891,6 +789,8 @@ class views_handler_field_field extends views_handler_field {
 
     $items = array();
     if ($this->options['field_api_classes']) {
+      // Make a copy.
+      $array = $render_array;
       return array(array('rendered' => drupal_render($render_array)));
     }
 
@@ -904,7 +804,7 @@ class views_handler_field_field extends views_handler_field {
       if (isset($render_array['#access'])) {
         $items[$count]['rendered']['#access'] = $render_array['#access'];
       }
-      // Only add the raw field items (for use in tokens) if the current user
+      // Only add the raw field items (for use in tokens) if the curent user
       // has access to view the field content.
       if ((!isset($items[$count]['rendered']['#access']) || $items[$count]['rendered']['#access']) && !empty($render_array['#items'][$count])) {
         $items[$count]['raw'] = $render_array['#items'][$count];
@@ -913,37 +813,28 @@ class views_handler_field_field extends views_handler_field {
     return $items;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function render_item($count, $item) {
+  function render_item($count, $item) {
     return render($item['rendered']);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function document_self_tokens(&$tokens) {
+  function document_self_tokens(&$tokens) {
     $field = $this->field_info;
     foreach ($field['columns'] as $id => $column) {
       $tokens['[' . $this->options['id'] . '-' . $id . ']'] = t('Raw @column', array('@column' => $id));
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function add_self_tokens(&$tokens, $item) {
+  function add_self_tokens(&$tokens, $item) {
     $field = $this->field_info;
     foreach ($field['columns'] as $id => $column) {
-      // Use filter_xss_admin because it's user data and we can't be sure it is
-      // safe. We know nothing about the data, though, so we can't really do
-      // much else.
+      // Use filter_xss_admin because it's user data and we can't be sure it is safe.
+      // We know nothing about the data, though, so we can't really do much else.
+
       if (isset($item['raw'])) {
         // If $item['raw'] is an array then we can use as is, if it's an object
         // we cast it to an array, if it's neither, we can't use it.
         $raw = is_array($item['raw']) ? $item['raw'] :
-               (is_object($item['raw']) ? (array) $item['raw'] : NULL);
+               (is_object($item['raw']) ? (array)$item['raw'] : NULL);
       }
       if (isset($raw) && isset($raw[$id]) && is_scalar($raw[$id])) {
         $tokens['[' . $this->options['id'] . '-' . $id . ']'] = filter_xss_admin($raw[$id]);
@@ -959,7 +850,7 @@ class views_handler_field_field extends views_handler_field {
    * Return the language code of the language the field should be displayed in,
    * according to the settings.
    */
-  public function field_language($entity_type, $entity) {
+  function field_language($entity_type, $entity) {
     global $language_content;
 
     if (field_is_translatable($entity_type, $this->field_info)) {
@@ -968,11 +859,10 @@ class views_handler_field_field extends views_handler_field {
                               array($language_content->language, $default_language),
                               $this->view->display_handler->options['field_language']);
 
-      // Give the Field Language API a chance to fallback to a different
-      // language (or LANGUAGE_NONE), in case the field has no data for the
-      // selected language. field_view_field() does this as well, but since the
-      // returned language code is used before calling it, the fallback needs
-      // to happen explicitly.
+      // Give the Field Language API a chance to fallback to a different language
+      // (or LANGUAGE_NONE), in case the field has no data for the selected language.
+      // field_view_field() does this as well, but since the returned language code
+      // is used before calling it, the fallback needs to happen explicitly.
       $language = field_language($entity_type, $entity, $this->field_info['field_name'], $language);
 
       return $language;
@@ -981,5 +871,4 @@ class views_handler_field_field extends views_handler_field {
       return LANGUAGE_NONE;
     }
   }
-
 }

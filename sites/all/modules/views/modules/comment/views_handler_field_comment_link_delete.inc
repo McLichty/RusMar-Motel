@@ -1,29 +1,16 @@
 <?php
-
-/**
- * @file
- * Definition of views_handler_field_comment_link_delete.
- */
-
 /**
  * Field handler to present a link to delete a node.
  *
  * @ingroup views_field_handlers
  */
 class views_handler_field_comment_link_delete extends views_handler_field_comment_link {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function access() {
-    // Needs permission to administer comments in general.
+  function access() {
+    //needs permission to administer comments in general
     return user_access('administer comments');
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function render_link($data, $values) {
+  function render_link($data, $values) {
     $text = !empty($this->options['text']) ? $this->options['text'] : t('delete');
     $cid =  $this->get_value($values, 'cid');
 
@@ -33,5 +20,4 @@ class views_handler_field_comment_link_delete extends views_handler_field_commen
 
     return $text;
   }
-
 }
