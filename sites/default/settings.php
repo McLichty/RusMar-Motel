@@ -178,9 +178,9 @@
  * @endcode
  */
 $databases = array (
-  'default' => 
+  'default' =>
   array (
-    'default' => 
+    'default' =>
     array (
       'database' => 'mclichty_rusmar_motel_prod',
       'username' => 'mclichty_mcannon',
@@ -501,3 +501,12 @@ $conf['404_fast_html'] = '<html xmlns="http://www.w3.org/1999/xhtml"><head><titl
  * Remove the leading hash signs to disable.
  */
 # $conf['allow_authorize_operations'] = FALSE;
+
+/**
+ * Include a local settings file if it exists.
+ */
+
+$local_settings = dirname(__FILE__) . '/settings.local.php';
+if (file_exists($local_settings)) {
+  include_once $local_settings;
+}
