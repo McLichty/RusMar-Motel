@@ -1,6 +1,6 @@
 <?php
 /**
- * @file views-view.tpl.php
+ * @file
  * Main view template
  *
  * Variables available:
@@ -35,22 +35,22 @@
   <?php endif; ?>
   <?php print render($title_suffix); ?>
 
-  <?php if($rows): ?>
+  <?php if ($rows): ?>
 
-    <div id="<?php print $views_nivo_slider_id ?>" class="views-nivo-slider clear-block">
+    <div id="<?php print $views_nivo_slider_id ?>" class="views-nivo-slider clearfix">
       <?php foreach ($rows as $row): ?>
-        <?php print $row?>
+        <?php print $row ?>
       <?php endforeach; ?>
     </div>
     <?php if (!empty($view->_vns_captions) && is_array($view->_vns_captions)): ?>
-      <?php foreach($view->_vns_captions as $vns_id => $vns_caption): ?>
+      <?php foreach ($view->_vns_captions as $vns_id => $vns_caption): ?>
         <div id="<?php print $vns_id ?>" class="nivo-html-caption">
           <?php print $vns_caption; ?>
         </div>
       <?php endforeach; ?>
     <?php endif; ?>
 
-  <?php elseif($empty): ?>
+  <?php elseif ($empty): ?>
     <div class="view-empty">
       <?php print $empty; ?>
     </div>

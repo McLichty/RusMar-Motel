@@ -13,17 +13,17 @@
  * @ingroup views_row_plugins
  */
 class views_nivo_slider_plugin_row_nivo_sliderfields extends views_plugin_row {
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['image_field'] = array('default' => '');
     $options['title_field'] = array('default' => '');
     $options['link_field'] = array('default' => '');
     return $options;
   }
-  
-  function options_form(&$form, &$form_state) {
+
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
-  
+
     // Pre-build all of our option lists for the dials and switches that follow.
     $fields = array('' => t('<None>'));
     foreach ($this->display->handler->get_handlers('field') as $field => $handler) {
@@ -34,7 +34,7 @@ class views_nivo_slider_plugin_row_nivo_sliderfields extends views_plugin_row {
         $fields[$field] = $handler->ui_name();
       }
     }
-   
+
     $form['image_field'] = array(
       '#type' => 'select',
       '#title' => t('Image field'),
@@ -50,7 +50,7 @@ class views_nivo_slider_plugin_row_nivo_sliderfields extends views_plugin_row {
       '#default_value' => $this->options['title_field'],
       '#description' => t('Select the field that will be used as the title field, if one is required.'),
     );
- 
+
     $form['link_field'] = array(
       '#type' => 'select',
       '#title' => t('Link field'),
