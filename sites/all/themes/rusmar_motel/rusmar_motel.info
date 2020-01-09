@@ -29,3 +29,6 @@ regions[sidebar_first]  = Left sidebar
 regions[sidebar_second] = Right sidebar
 regions[footer]         = Footer
 regions[page_bottom]    = Page bottom
+
+; Settings.
+settings[is_rio] = FALSE
