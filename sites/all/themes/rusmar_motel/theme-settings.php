@@ -1,7 +1,6 @@
 <?php
 
 function rusmar_motel_form_system_theme_settings_alter(&$form, $form_state) {
-  dpm($form);
   $form['is_rio'] = array(
     '#type' => 'checkbox',
     '#title' => t('Is Rio Motel site?.'),
