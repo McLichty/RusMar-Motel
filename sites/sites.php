@@ -53,6 +53,10 @@
  * @see conf_path()
  * @see http://drupal.org/documentation/install/multi-site
  */
+
+$sites['rusmarmotel.com'] = 'rusmarmotel';
+$sites['riomotelandsuites.com'] = 'rio';
+
 $local_sites_file = dirname(__FILE__) . "/sites.local.php";
 if (file_exists($local_sites_file)) {
   include $local_sites_file;

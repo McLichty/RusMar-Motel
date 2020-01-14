@@ -218,7 +218,7 @@ function rio_core_strongarm() {
     'logo_path' => 'sites/all/themes/rusmar_motel/img/logos/logo.png',
     'logo_upload' => '',
     'default_favicon' => 0,
-    'favicon_path' => 'public://favicon.ico',
+    'favicon_path' => 'sites/all/themes/rusmar_motel/img/logos/favicon-rio.ico',
     'favicon_upload' => '',
     'is_rio' => 1,
     'logo_rio_url' => 'sites/all/themes/rusmar_motel/img/logos/logo-rio.png',
