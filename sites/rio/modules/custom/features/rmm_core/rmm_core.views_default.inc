@@ -135,7 +135,6 @@ function rmm_core_views_default_views() {
   $handler->display->display_options['pager']['options']['items_per_page'] = '5';
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['style_plugin'] = 'views_nivo_slider';
-  $handler->display->display_options['style_options']['imagefield_preset'] = 'large';
   $handler->display->display_options['style_options']['effect'] = array(
     'random' => 'random',
   );

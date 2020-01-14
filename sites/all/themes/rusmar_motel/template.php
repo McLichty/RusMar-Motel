@@ -80,69 +80,74 @@ function rusmar_motel_preprocess_node(&$vars, $hook) {
  * Preprocessor for page.tpl.php template file.
  */
 function rusmar_motel_preprocess_page(&$vars, $hook) {
+  global $base_url, $base_path;
+  // For easy printing of variables.
+  $is_rio = theme_get_setting('is_rio');
+  $logo_rio_url = theme_get_setting('logo_rio_url');
+  if ($is_rio && !empty($logo_rio_url)) {
+    $vars['logo'] = $base_url . $base_path . $logo_rio_url;
+  }
+  $vars['logo_img'] = '';
+  if (!empty($vars['logo'])) {
+    $vars['logo_img'] = theme('image', array(
+      'path'	=> $vars['logo'],
+      'alt'	 => t('Home'),
+      'title' => t('Home'),
+    ));
+  }
+  $vars['linked_logo_img']	= '';
+  if (!empty($vars['logo_img'])) {
+    $vars['linked_logo_img'] = l($vars['logo_img'], '<front>', array(
+      'attributes' => array(
+        'rel'	 => 'home',
+        'title' => t('Home'),
+      ),
+      'html' => TRUE,
+    ));
+  }
+  $vars['linked_site_name'] = '';
+  if (!empty($vars['site_name'])) {
+    $vars['linked_site_name'] = l($vars['site_name'], '<front>', array(
+      'attributes' => array(
+        'rel'	 => 'home',
+        'title' => t('Home'),
+      ),
+    ));
+  }
 
-	// For easy printing of variables.
-	$vars['logo_img'] = '';
-	if (!empty($vars['logo'])) {
-		$vars['logo_img'] = theme('image', array(
-			'path'	=> $vars['logo'],
-			'alt'	 => t('Home'),
-			'title' => t('Home'),
-		));
-	}
-	$vars['linked_logo_img']	= '';
-	if (!empty($vars['logo_img'])) {
-		$vars['linked_logo_img'] = l($vars['logo_img'], '<front>', array(
-			'attributes' => array(
-				'rel'	 => 'home',
-				'title' => t('Home'),
-			),
-			'html' => TRUE,
-		));
-	}
-	$vars['linked_site_name'] = '';
-	if (!empty($vars['site_name'])) {
-		$vars['linked_site_name'] = l($vars['site_name'], '<front>', array(
-			'attributes' => array(
-				'rel'	 => 'home',
-				'title' => t('Home'),
-			),
-		));
-	}
-
-	// Site navigation links.
-	$vars['main_menu_links'] = '';
-	if (isset($vars['main_menu'])) {
-		$vars['main_menu_links'] = theme('links__system_main_menu', array(
-			'links' => $vars['main_menu'],
-			'attributes' => array(
-				'id' => 'main-menu',
-				'class' => array('inline', 'main-menu'),
-			),
-			'heading' => array(
-				'text' => t('Main menu'),
-				'level' => 'h2',
-				'class' => array('element-invisible'),
-			),
-		));
-	}
-	$vars['secondary_menu_links'] = '';
-	if (isset($vars['secondary_menu'])) {
-		$vars['secondary_menu_links'] = theme('links__system_secondary_menu', array(
-			'links' => $vars['secondary_menu'],
-			'attributes' => array(
-				'id'		=> 'secondary-menu',
-				'class' => array('inline', 'secondary-menu'),
-			),
-			'heading' => array(
-				'text' => t('Secondary menu'),
-				'level' => 'h2',
-				'class' => array('element-invisible'),
-			),
-		));
-	}
-
+// Site navigation links.
+  $vars['main_menu_links'] = '';
+  if (isset($vars['main_menu'])) {
+    $vars['main_menu_links'] = theme('links__system_main_menu', array(
+      'links' => $vars['main_menu'],
+      'attributes' => array(
+        'id' => 'main-menu',
+        'class' => array('inline', 'main-menu'),
+      ),
+      'heading' => array(
+        'text' => t('Main menu'),
+        'level' => 'h2',
+        'class' => array('element-invisible'),
+      ),
+    ));
+  }
+  $vars['secondary_menu_links'] = '';
+  if (isset($vars['secondary_menu'])) {
+    $vars['secondary_menu_links'] = theme('links__system_secondary_menu', array(
+      'links' => $vars['secondary_menu'],
+      'attributes' => array(
+        'id'		=> 'secondary-menu',
+        'class' => array('inline', 'secondary-menu'),
+      ),
+      'heading' => array(
+        'text' => t('Secondary menu'),
+        'level' => 'h2',
+        'class' => array('element-invisible'),
+      ),
+    ));
+  }
 }
+
 function rusmar_motel_links__system_main_menu(&$vars) {
 //	foreach ($vars['links'] as &$link) {
 		// do what you need here...
@@ -153,6 +158,7 @@ function rusmar_motel_links__system_main_menu(&$vars) {
 //	}
 	return rusmar_motel_links($vars);
 }
+
 function rusmar_motel_links($variables) {
 	$links = $variables['links'];
 	$attributes = $variables['attributes'];
@@ -170,7 +176,7 @@ function rusmar_motel_links($variables) {
 				// is a string.
 				$heading = array(
 					'text' => $heading,
-					// Set the default level of the heading. 
+					// Set the default level of the heading.
 					'level' => 'h2',
 				);
 			}
@@ -267,7 +273,7 @@ function ns() {
 
 /**
  * Implements hook_css_alter.
- * 
+ *
  * This rearranges how the style sheets are included so the framework styles
  * are included first.
  *
