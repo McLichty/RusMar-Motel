@@ -55,7 +55,11 @@
  */
 
 $sites['rusmarmotel.com'] = 'rusmarmotel';
+$sites['dev.rusmarmotel.com'] = 'rusmarmotel';
+$sites['stg.rusmarmotel.com'] = 'rusmarmotel';
 $sites['riomotelandsuites.com'] = 'rio';
+$sites['dev.riomotelandsuites.com'] = 'rio';
+$sites['stg.riomotelandsuites.com'] = 'rio';
 
 $local_sites_file = dirname(__FILE__) . "/sites.local.php";
 if (file_exists($local_sites_file)) {
