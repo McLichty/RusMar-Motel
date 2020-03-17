@@ -1,27 +1,5 @@
-/* line 1, ../sass/ie.scss */
-body {
-  background: url("img/bg_main_blocks_ie.gif");
-}
-
-/* line 6, ../sass/ie.scss */
-#main-content-top #promotion-alpha .region {
-  background: none;
-  border: none;
-}
-
-/* line 16, ../sass/ie.scss */
-#lightbox .lightbox2-alt-layout-data #bottomNavClose,
-#lightbox .lightbox2-alt-layout #bottomNavClose {
-  background-position: 2px 2px;
-  padding: 2px;
-}
-/* line 26, ../sass/ie.scss */
-#lightbox .lightbox2-alt-layout-data #bottomNavClose:hover, #lightbox .lightbox2-alt-layout-data #bottomNavClose:focus,
-#lightbox .lightbox2-alt-layout #bottomNavClose:hover,
-#lightbox .lightbox2-alt-layout #bottomNavClose:focus {
-  background-position: -24px 2px;
-}
-/* line 32, ../sass/ie.scss */
-#lightbox #imageData #bottomNav {
-  height: 0;
-}
+/* Welcome to Compass. Use this file to write IE specific override styles.
+ * Import this file using the following HTML or equivalent:
+ * <!--[if IE]>
+ *   <link href="/stylesheets/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
+ * <![endif]--> */
