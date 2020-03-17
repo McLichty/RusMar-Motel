@@ -16,66 +16,66 @@ if(module_exists('ctools')){
  * Implements hook_preprocess_html
  */
 function rusmar_motel_preprocess_html(&$vars) {
-	// 'show-grid' turns on the grid
-	//$vars['classes_array'][] = 'show-grid';
-	if (module_exists('rdf')) {
-		$vars['doctype'] = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML+RDFa 1.1//EN">' . "\n";
-		$vars['rdf']->version = ' version="HTML+RDFa 1.1"';
-		$vars['rdf']->namespaces = $vars['rdf_namespaces'];
-		$vars['rdf']->profile = ' profile="' . $vars['grddl_profile'] . '"';
-	} else {
-		$vars['doctype'] = '<!DOCTYPE html>' . "\n";
-		$vars['rdf']->version = '';
-		$vars['rdf']->namespaces = '';
-		$vars['rdf']->profile = '';
-	}
+  // For easy printing of variables.
+  $is_rio = theme_get_setting('is_rio');
+  // 'show-grid' turns on the grid
+  //$vars['classes_array'][] = 'show-grid';
+  if (module_exists('rdf')) {
+    $vars['doctype'] = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML+RDFa 1.1//EN">' . "\n";
+    $vars['rdf']->version = ' version="HTML+RDFa 1.1"';
+    $vars['rdf']->namespaces = $vars['rdf_namespaces'];
+    $vars['rdf']->profile = ' profile="' . $vars['grddl_profile'] . '"';
+  }
+  else {
+    $vars['doctype'] = '<!DOCTYPE html>' . "\n";
+    $vars['rdf']->version = '';
+    $vars['rdf']->namespaces = '';
+    $vars['rdf']->profile = '';
+  }
+  // If rio, add "site--rio" class to body.
+  if ($is_rio) {
+    $vars['classes_array'][] = 'site--rio';
+  }
 }
 /**
  * Preprocessor for field.tpl.php template file.
  */
 function rusmar_motel_preprocess_field(&$vars, $hook) {
-	if($vars['element']['#field_name'] == 'body') {
-		$vars['is_main_content'] = true; // when this is set to TRUE, all field divs are hidden
-	}else{
-		$vars['is_main_content'] = false;
-	}
+  if($vars['element']['#field_name'] == 'body') {
+    $vars['is_main_content'] = true; // when this is set to TRUE, all field divs are hidden
+  }
+  else{
+    $vars['is_main_content'] = false;
+  }
 }
-//function rusmar_motel_preprocess_views_view(&$vars) {
-//	dpm($vars);
-//}
+
 /**
  * Preprocessor for block.tpl.php template file.
  */
 function rusmar_motel_preprocess_block(&$vars, $hook) {
-	// if ctools active, add the block title as a class to the block
-	if(RUSMAR_MOTEL_CTOOLS_PATH) {
-		/**
-		 * The default ignore word list.
-		 */
-		$ignore_words = 'a, an, as, at, before, but, by, for, from, is, in, into, like, of, off, on, onto, per, since, than, the, this, that, to, up, via, with';
-		$settings = array(
-			'clean slash' => TRUE,
-			'ignore words' => $ignore_words,
-			'separator' => '-',
-			'replacements' => array(),
-			'transliterate' => FALSE,
-			'reduce ascii' => TRUE,
-			'max length' => FALSE,
-			'lower case' => TRUE,
-		);
-		// clean up title with 'ctools_cleanstring()'
-		$title = ctools_cleanstring($vars['elements']['#block']->title, $settings);
-//		dpm($vars['elements']);
+  // if ctools active, add the block title as a class to the block
+  if (RUSMAR_MOTEL_CTOOLS_PATH) {
+    /**
+     * The default ignore word list.
+     */
+    $ignore_words = 'a, an, as, at, before, but, by, for, from, is, in, into, like, of, off, on, onto, per, since, than, the, this, that, to, up, via, with';
+    $settings = array(
+      'clean slash' => TRUE,
+      'ignore words' => $ignore_words,
+      'separator' => '-',
+      'replacements' => array(),
+      'transliterate' => FALSE,
+      'reduce ascii' => TRUE,
+      'max length' => FALSE,
+      'lower case' => TRUE,
+    );
+    // Clean up title with 'ctools_cleanstring()'.
+    $title = ctools_cleanstring($vars['elements']['#block']->title, $settings);
 
-		array_push($vars['classes_array'], $title);
-	}
+    array_push($vars['classes_array'], $title);
+  }
 }
-/**
- * Preprocessor for node.tpl.php template file.
- */
-function rusmar_motel_preprocess_node(&$vars, $hook) {
-	//dpm($vars);
-}
+
 /**
  * Preprocessor for page.tpl.php template file.
  */
