@@ -16,133 +16,138 @@ if(module_exists('ctools')){
  * Implements hook_preprocess_html
  */
 function rusmar_motel_preprocess_html(&$vars) {
-	// 'show-grid' turns on the grid
-	//$vars['classes_array'][] = 'show-grid';
-	if (module_exists('rdf')) {
-		$vars['doctype'] = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML+RDFa 1.1//EN">' . "\n";
-		$vars['rdf']->version = ' version="HTML+RDFa 1.1"';
-		$vars['rdf']->namespaces = $vars['rdf_namespaces'];
-		$vars['rdf']->profile = ' profile="' . $vars['grddl_profile'] . '"';
-	} else {
-		$vars['doctype'] = '<!DOCTYPE html>' . "\n";
-		$vars['rdf']->version = '';
-		$vars['rdf']->namespaces = '';
-		$vars['rdf']->profile = '';
-	}
+  // For easy printing of variables.
+  $is_rio = theme_get_setting('is_rio');
+  // 'show-grid' turns on the grid
+  //$vars['classes_array'][] = 'show-grid';
+  if (module_exists('rdf')) {
+    $vars['doctype'] = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML+RDFa 1.1//EN">' . "\n";
+    $vars['rdf']->version = ' version="HTML+RDFa 1.1"';
+    $vars['rdf']->namespaces = $vars['rdf_namespaces'];
+    $vars['rdf']->profile = ' profile="' . $vars['grddl_profile'] . '"';
+  }
+  else {
+    $vars['doctype'] = '<!DOCTYPE html>' . "\n";
+    $vars['rdf']->version = '';
+    $vars['rdf']->namespaces = '';
+    $vars['rdf']->profile = '';
+  }
+  // If rio, add "site--rio" class to body.
+  if ($is_rio) {
+    $vars['classes_array'][] = 'site--rio';
+  }
 }
 /**
  * Preprocessor for field.tpl.php template file.
  */
 function rusmar_motel_preprocess_field(&$vars, $hook) {
-	if($vars['element']['#field_name'] == 'body') {
-		$vars['is_main_content'] = true; // when this is set to TRUE, all field divs are hidden
-	}else{
-		$vars['is_main_content'] = false;
-	}
+  if($vars['element']['#field_name'] == 'body') {
+    $vars['is_main_content'] = true; // when this is set to TRUE, all field divs are hidden
+  }
+  else{
+    $vars['is_main_content'] = false;
+  }
 }
-//function rusmar_motel_preprocess_views_view(&$vars) {
-//	dpm($vars);
-//}
+
 /**
  * Preprocessor for block.tpl.php template file.
  */
 function rusmar_motel_preprocess_block(&$vars, $hook) {
-	// if ctools active, add the block title as a class to the block
-	if(RUSMAR_MOTEL_CTOOLS_PATH) {
-		/**
-		 * The default ignore word list.
-		 */
-		$ignore_words = 'a, an, as, at, before, but, by, for, from, is, in, into, like, of, off, on, onto, per, since, than, the, this, that, to, up, via, with';
-		$settings = array(
-			'clean slash' => TRUE,
-			'ignore words' => $ignore_words,
-			'separator' => '-',
-			'replacements' => array(),
-			'transliterate' => FALSE,
-			'reduce ascii' => TRUE,
-			'max length' => FALSE,
-			'lower case' => TRUE,
-		);
-		// clean up title with 'ctools_cleanstring()'
-		$title = ctools_cleanstring($vars['elements']['#block']->title, $settings);
-//		dpm($vars['elements']);
+  // if ctools active, add the block title as a class to the block
+  if (RUSMAR_MOTEL_CTOOLS_PATH) {
+    /**
+     * The default ignore word list.
+     */
+    $ignore_words = 'a, an, as, at, before, but, by, for, from, is, in, into, like, of, off, on, onto, per, since, than, the, this, that, to, up, via, with';
+    $settings = array(
+      'clean slash' => TRUE,
+      'ignore words' => $ignore_words,
+      'separator' => '-',
+      'replacements' => array(),
+      'transliterate' => FALSE,
+      'reduce ascii' => TRUE,
+      'max length' => FALSE,
+      'lower case' => TRUE,
+    );
+    // Clean up title with 'ctools_cleanstring()'.
+    $title = ctools_cleanstring($vars['elements']['#block']->title, $settings);
 
-		array_push($vars['classes_array'], $title);
-	}
+    array_push($vars['classes_array'], $title);
+  }
 }
-/**
- * Preprocessor for node.tpl.php template file.
- */
-function rusmar_motel_preprocess_node(&$vars, $hook) {
-	//dpm($vars);
-}
+
 /**
  * Preprocessor for page.tpl.php template file.
  */
 function rusmar_motel_preprocess_page(&$vars, $hook) {
+  global $base_url, $base_path;
+  // For easy printing of variables.
+  $is_rio = theme_get_setting('is_rio');
+  $logo_rio_url = theme_get_setting('logo_rio_url');
+  if ($is_rio && !empty($logo_rio_url)) {
+    $vars['logo'] = $base_url . $base_path . $logo_rio_url;
+  }
+  $vars['logo_img'] = '';
+  if (!empty($vars['logo'])) {
+    $vars['logo_img'] = theme('image', array(
+      'path'	=> $vars['logo'],
+      'alt'	 => t('Home'),
+      'title' => t('Home'),
+    ));
+  }
+  $vars['linked_logo_img']	= '';
+  if (!empty($vars['logo_img'])) {
+    $vars['linked_logo_img'] = l($vars['logo_img'], '<front>', array(
+      'attributes' => array(
+        'rel'	 => 'home',
+        'title' => t('Home'),
+      ),
+      'html' => TRUE,
+    ));
+  }
+  $vars['linked_site_name'] = '';
+  if (!empty($vars['site_name'])) {
+    $vars['linked_site_name'] = l($vars['site_name'], '<front>', array(
+      'attributes' => array(
+        'rel'	 => 'home',
+        'title' => t('Home'),
+      ),
+    ));
+  }
 
-	// For easy printing of variables.
-	$vars['logo_img'] = '';
-	if (!empty($vars['logo'])) {
-		$vars['logo_img'] = theme('image', array(
-			'path'	=> $vars['logo'],
-			'alt'	 => t('Home'),
-			'title' => t('Home'),
-		));
-	}
-	$vars['linked_logo_img']	= '';
-	if (!empty($vars['logo_img'])) {
-		$vars['linked_logo_img'] = l($vars['logo_img'], '<front>', array(
-			'attributes' => array(
-				'rel'	 => 'home',
-				'title' => t('Home'),
-			),
-			'html' => TRUE,
-		));
-	}
-	$vars['linked_site_name'] = '';
-	if (!empty($vars['site_name'])) {
-		$vars['linked_site_name'] = l($vars['site_name'], '<front>', array(
-			'attributes' => array(
-				'rel'	 => 'home',
-				'title' => t('Home'),
-			),
-		));
-	}
-
-	// Site navigation links.
-	$vars['main_menu_links'] = '';
-	if (isset($vars['main_menu'])) {
-		$vars['main_menu_links'] = theme('links__system_main_menu', array(
-			'links' => $vars['main_menu'],
-			'attributes' => array(
-				'id' => 'main-menu',
-				'class' => array('inline', 'main-menu'),
-			),
-			'heading' => array(
-				'text' => t('Main menu'),
-				'level' => 'h2',
-				'class' => array('element-invisible'),
-			),
-		));
-	}
-	$vars['secondary_menu_links'] = '';
-	if (isset($vars['secondary_menu'])) {
-		$vars['secondary_menu_links'] = theme('links__system_secondary_menu', array(
-			'links' => $vars['secondary_menu'],
-			'attributes' => array(
-				'id'		=> 'secondary-menu',
-				'class' => array('inline', 'secondary-menu'),
-			),
-			'heading' => array(
-				'text' => t('Secondary menu'),
-				'level' => 'h2',
-				'class' => array('element-invisible'),
-			),
-		));
-	}
-
+// Site navigation links.
+  $vars['main_menu_links'] = '';
+  if (isset($vars['main_menu'])) {
+    $vars['main_menu_links'] = theme('links__system_main_menu', array(
+      'links' => $vars['main_menu'],
+      'attributes' => array(
+        'id' => 'main-menu',
+        'class' => array('inline', 'main-menu'),
+      ),
+      'heading' => array(
+        'text' => t('Main menu'),
+        'level' => 'h2',
+        'class' => array('element-invisible'),
+      ),
+    ));
+  }
+  $vars['secondary_menu_links'] = '';
+  if (isset($vars['secondary_menu'])) {
+    $vars['secondary_menu_links'] = theme('links__system_secondary_menu', array(
+      'links' => $vars['secondary_menu'],
+      'attributes' => array(
+        'id'		=> 'secondary-menu',
+        'class' => array('inline', 'secondary-menu'),
+      ),
+      'heading' => array(
+        'text' => t('Secondary menu'),
+        'level' => 'h2',
+        'class' => array('element-invisible'),
+      ),
+    ));
+  }
 }
+
 function rusmar_motel_links__system_main_menu(&$vars) {
 //	foreach ($vars['links'] as &$link) {
 		// do what you need here...
@@ -153,6 +158,7 @@ function rusmar_motel_links__system_main_menu(&$vars) {
 //	}
 	return rusmar_motel_links($vars);
 }
+
 function rusmar_motel_links($variables) {
 	$links = $variables['links'];
 	$attributes = $variables['attributes'];
@@ -170,7 +176,7 @@ function rusmar_motel_links($variables) {
 				// is a string.
 				$heading = array(
 					'text' => $heading,
-					// Set the default level of the heading. 
+					// Set the default level of the heading.
 					'level' => 'h2',
 				);
 			}
@@ -267,7 +273,7 @@ function ns() {
 
 /**
  * Implements hook_css_alter.
- * 
+ *
  * This rearranges how the style sheets are included so the framework styles
  * are included first.
  *

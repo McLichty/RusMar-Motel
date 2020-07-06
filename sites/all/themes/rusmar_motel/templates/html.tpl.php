@@ -49,8 +49,10 @@
 	<link rel="stylesheet" href="http://universal-ie6-css.googlecode.com/files/ie6.1.1.css" media="screen, projection">
 	<![endif]-->
 	<?php print $scripts; ?>
-	<script src="http://www2.webervations.com/calendars/16715_setup.js" ></script>
-	<!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+<!--	<script src="http://www2.webervations.com/calendars/16715_setup.js" ></script>-->
+	<!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
 </head>
 <body class="<?php print $classes; ?>" <?php print $attributes;?>>
 	<div id="skip-link">

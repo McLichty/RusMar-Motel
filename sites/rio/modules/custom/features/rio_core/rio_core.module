@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * @file
+ * Code for the Rio Motel Core feature.
+ */
+
+include_once 'rio_core.features.inc';
