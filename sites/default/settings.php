@@ -182,8 +182,8 @@ $databases = array (
   array (
     'default' =>
     array (
-      'database' => 'mclichty_rusmar_motel_prod',
-      'username' => 'mclichty_mcannon',
+      'database' => 'a064d495_rusmar_motel_prod',
+      'username' => 'a064d495_mcannon',
       'password' => 'I66mH68j7A1q',
       'host' => 'localhost',
       'port' => '',
